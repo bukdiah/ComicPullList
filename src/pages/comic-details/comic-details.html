@@ -1,0 +1,30 @@
+<!--
+  Generated template for the ComicDetailsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <button menuToggle *ngIf="!selectedItem">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Comic Details</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <h3 text-center *ngIf="selectedItem">
+    {{selectedItem.title}}
+  </h3>
+  <img style="height: auto; width: 70vw; margin: auto; display: block" [src] ="selectedItem.cover_url">
+  <p text-left *ngIf="selectedItem">
+    By: {{selectedItem.creators}}
+  </p>
+  <p text-left *ngIf="selectedItem">
+    {{selectedItem.description}}
+  </p>
+</ion-content>
