@@ -28,7 +28,7 @@
     {{selectedItem.description}}
   </p>
   <div>
-  <button float-left ion-button icon-start (click)="addToPullList()">
+  <button [disabled]="added" float-left ion-button icon-start (click)="addToPullList()">
     <ion-icon name='add'></ion-icon>
     Add to Pull List
   </button>

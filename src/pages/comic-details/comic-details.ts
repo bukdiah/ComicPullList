@@ -16,7 +16,7 @@ import { Storage } from '@ionic/storage';
 export class ComicDetailsPage {
   selectedItem: any;
   list: Comic[];
-
+  added: boolean;
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');
@@ -33,16 +33,27 @@ export class ComicDetailsPage {
 
           for (var comic of this.list)
             {
-              console.log("Comic",comic)
+              if(this.selectedItem.title === comic.title)
+                {
+                  console.log("TITLE SAVED IN PULL LIST ALREADY", comic.title);
+                  this.selectedItem.added = true;
+                  this.added = this.selectedItem.added;
+                }
             }
         }
       else{
         this.list = [];
+        //console.log('added =', this.added)
+        this.added = false;
       }
     });
   }
 
   addToPullList(){
+   // this.selectedItem.added = false;
+
+   // this.added = this.selectedItem.added;
+    this.added = true;
     this.list.push(this.selectedItem);
     
     //this.storage.set('pull-list', JSON.stringify(this.selectedItem));
@@ -59,5 +70,6 @@ interface Comic {
   creators: string, 
   release_date: string, 
   diamond_id: string,
-  cover_url?: string
+  cover_url?: string,
+  added?: boolean
 }
