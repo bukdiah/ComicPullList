@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
 import {ComicProvider} from '../../providers/comic/comic';
 import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
+
 /**
- * Generated class for the DcPage page.
+ * Generated class for the AllPage page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
@@ -11,22 +12,20 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 
 @IonicPage()
 @Component({
-  selector: 'page-dc',
-  templateUrl: 'dc.html',
+  selector: 'page-all',
+  templateUrl: 'all.html',
 })
-export class DcPage {
-
-  //items: Array<{publisher: string,title: string, price: string, desc: string, creators: string, release_date: string, diamond_id: string}>;
+export class AllPage {
   items : Comic[];
   cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/200/';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-  private comicProvider: ComicProvider, private loadingCtrl: LoadingController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private loadingCtrl: LoadingController,
+  private comicProvider: ComicProvider) {
     this.items = [];
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad DcPage');
+    console.log('ionViewDidLoad AllPage');
 
     //Create the loading popup
     let loadingPopup = this.loadingCtrl.create({
@@ -36,7 +35,7 @@ export class DcPage {
     //Show the pop up
     loadingPopup.present();
 
-    this.comicProvider.getDCComics().subscribe((data)=>{
+    this.comicProvider.getAllComics().subscribe((data)=>{
       this.items = data.comics;
       loadingPopup.dismiss();
     },
@@ -57,9 +56,10 @@ export class DcPage {
       item: item
     });
   }
+
 }
 
-export interface Comic {
+interface Comic {
   publisher: string,
   title: string, 
   price: string, 

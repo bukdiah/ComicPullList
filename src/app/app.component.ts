@@ -3,11 +3,12 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, MenuController, Nav } from 'ionic-angular';
 
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
-import { ListPage } from '../pages/list/list';
 import {DcPage} from '../pages/dc/dc';
 import {PullListPage} from '../pages/pull-list/pull-list';
+
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import {AllPage} from '../pages/all/all';
 
 
 @Component({
@@ -18,6 +19,7 @@ export class MyApp {
 
   // make HelloIonicPage the root (or first) page
   rootPage = HelloIonicPage;
+  //rootPage = AllPage;
   pages: Array<{title: string, component: any, icon?: String}>;
 
   constructor(
@@ -30,8 +32,8 @@ export class MyApp {
 
     // set our app's pages
     this.pages = [
-      { title: 'Hello Ionic', component: HelloIonicPage },
-      { title: 'My First List', component: ListPage },
+      { title: 'Main', component: HelloIonicPage },
+      {title: 'All', component: AllPage/*, icon: 'list-box'*/},
       {title: 'DC', component: DcPage/*, icon: 'list-box'*/},
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'}
     ];

@@ -44,6 +44,10 @@ export class PullListPage {
     });
   }
 
+  remove(item){
+    console.log("Removing",item);
+  }
+
 }
 
 interface Comic {

@@ -6,37 +6,37 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <button menuToggle *ngIf="!selectedItem">
+    <ion-navbar>
+        <button menuToggle *ngIf="!selectedItem">
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Comic Details</ion-title>
-  </ion-navbar>
+        <ion-title>Comic Details</ion-title>
+    </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-  <h3 text-center *ngIf="selectedItem">
-    {{selectedItem.title}}
-  </h3>
-  <img style="height: auto; width: 70vw; margin: auto; display: block" [src] ="selectedItem.cover_url">
-  <p text-left *ngIf="selectedItem">
-    By: {{selectedItem.creators}}
-  </p>
-  <p text-left *ngIf="selectedItem">
-    {{selectedItem.description}}
-  </p>
-  <div>
-  <button [disabled]="added" float-left ion-button icon-start (click)="addToPullList()">
+    <h3 text-center *ngIf="selectedItem">
+        {{selectedItem.title}}
+    </h3>
+    <img style="height: auto; width: 70vw; margin: auto; display: block" [src]="selectedItem.cover_url">
+    <p text-left *ngIf="selectedItem">
+        By: {{selectedItem.creators}}
+    </p>
+    <p text-left *ngIf="selectedItem">
+        {{selectedItem.description}}
+    </p>
+    <div text-center>
+        <button [disabled]="added" ion-button icon-start (click)="addToPullList()">
     <ion-icon name='add'></ion-icon>
     Add to Pull List
   </button>
 
-  <button float-right ion-button icon-start>
+        <button ion-button icon-start>
     <ion-icon name='notifications'></ion-icon>
     Notify New Issues
   </button>
-</div>
+    </div>
 
 </ion-content>
