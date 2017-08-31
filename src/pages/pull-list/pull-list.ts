@@ -46,6 +46,20 @@ export class PullListPage {
 
   remove(item){
     console.log("Removing",item);
+
+    //Remove object from items array and then push that array to storage
+    for (var i=0; i< this.items.length; i++)
+      {
+        var comic = this.items[i];
+
+        if(item.diamond_id === comic.diamond_id)
+          {
+            console.log('WHOOP THERE IT IS');
+            this.items.splice(i,1);
+          }
+      }
+
+      this.storage.set('pull-list', this.items);
   }
 
 }

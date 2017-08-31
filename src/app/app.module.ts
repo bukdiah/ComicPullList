@@ -8,6 +8,8 @@ import {DcPage} from '../pages/dc/dc';
 import {ComicDetailsPage} from '../pages/comic-details/comic-details';
 import {PullListPage} from '../pages/pull-list/pull-list';
 import {AllPage} from '../pages/all/all';
+import {MarvelPage} from '../pages/marvel/marvel';
+import {ImagePage} from '../pages/image/image';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -24,7 +26,9 @@ import { IonicStorageModule } from '@ionic/storage';
     DcPage,
     ComicDetailsPage,
     PullListPage,
-    AllPage
+    AllPage,
+    MarvelPage,
+    ImagePage
   ],
   imports: [
     BrowserModule,
@@ -39,7 +43,9 @@ import { IonicStorageModule } from '@ionic/storage';
     DcPage,
     ComicDetailsPage,
     PullListPage,
-    AllPage
+    AllPage,
+    MarvelPage,
+    ImagePage
   ],
   providers: [
     StatusBar,

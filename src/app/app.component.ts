@@ -5,6 +5,8 @@ import { Platform, MenuController, Nav } from 'ionic-angular';
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import {DcPage} from '../pages/dc/dc';
 import {PullListPage} from '../pages/pull-list/pull-list';
+import {MarvelPage} from '../pages/marvel/marvel';
+import {ImagePage} from '../pages/image/image';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -33,8 +35,10 @@ export class MyApp {
     // set our app's pages
     this.pages = [
       { title: 'Main', component: HelloIonicPage },
-      {title: 'All', component: AllPage/*, icon: 'list-box'*/},
-      {title: 'DC', component: DcPage/*, icon: 'list-box'*/},
+      {title: 'All', component: AllPage, icon: 'book'},
+      {title: 'DC', component: DcPage, icon: 'ai-dc'},
+      {title: 'Marvel', component: MarvelPage/*, icon: 'list-box'*/},
+      {title: 'Image', component: ImagePage/*, icon: 'list-box'*/},
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'}
     ];
   }

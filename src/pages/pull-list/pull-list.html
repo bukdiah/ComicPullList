@@ -31,14 +31,15 @@
 
 <ion-content padding>
     <ion-list>
-        <div *ngFor="let item of items">
-            <button ion-item item-left clear (click)="remove(item)">
-            <ion-icon name="close"></ion-icon> 
-          </button>
-            <button ion-item (click)="itemSelected($event,item)">
-           {{ item.title }}
-            <div item-right>{{item.price}}</div>
-          </button>
-        </div>
+        <ion-item *ngFor="let item of items">
+            <button ion-button large item-start clear color="danger" (click)="remove(item)">
+            <ion-icon name="close-circle"></ion-icon> 
+            </button>
+            <h2>{{item.title}}</h2>
+             <p>{{item.price}}</p>
+            <button ion-button clear item-end (click)="itemSelected($event,item)">
+                View
+            </button>
+        </ion-item>
     </ion-list>
 </ion-content>
