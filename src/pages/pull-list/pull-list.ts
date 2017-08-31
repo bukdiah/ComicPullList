@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
+import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 /**
- * Generated class for the ComicDetailsPage page.
+ * Generated class for the PullListPage page.
  *
  * See http://ionicframework.com/docs/components/#navigation for more info
  * on Ionic pages and navigation.
@@ -10,43 +11,37 @@ import { Storage } from '@ionic/storage';
 
 @IonicPage()
 @Component({
-  selector: 'page-comic-details',
-  templateUrl: 'comic-details.html',
+  selector: 'page-pull-list',
+  templateUrl: 'pull-list.html',
 })
-export class ComicDetailsPage {
-  selectedItem: any;
-  list: Comic[];
+export class PullListPage {
+  items : Comic[];
+  //cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/200/';
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
-    // If we navigated to this page, we will have an item available as a nav param
-    this.selectedItem = navParams.get('item');
-    //this.list = [];
+    this.items = [];
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ComicDetailsPage');
-
+    console.log('ionViewDidLoad PullListPage');
     this.storage.get('pull-list').then((data)=>{
       if (data != null)
         {
-          this.list = data;
+          this.items = data;
 
-          for (var comic of this.list)
+          for (var comic of this.items)
             {
               console.log("Comic",comic)
             }
         }
-      else{
-        this.list = [];
-      }
     });
   }
 
-  addToPullList(){
-    this.list.push(this.selectedItem);
-    
-    //this.storage.set('pull-list', JSON.stringify(this.selectedItem));
-    this.storage.set('pull-list', this.list);
+  itemSelected(event, item) {
+    console.log('item = ', item);
+    this.navCtrl.push(ComicDetailsPage, {
+      item: item
+    });
   }
 
 }

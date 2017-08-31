@@ -8,12 +8,16 @@ import { ItemDetailsPage } from '../pages/item-details/item-details';
 import { ListPage } from '../pages/list/list';
 import {DcPage} from '../pages/dc/dc';
 import {ComicDetailsPage} from '../pages/comic-details/comic-details';
+import {PullListPage} from '../pages/pull-list/pull-list';
+
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ComicProvider } from '../providers/comic/comic';
 
 import{HttpModule} from '@angular/http';
+
+import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
   declarations: [
@@ -22,12 +26,14 @@ import{HttpModule} from '@angular/http';
     ItemDetailsPage,
     ListPage,
     DcPage,
-    ComicDetailsPage
+    ComicDetailsPage,
+    PullListPage
   ],
   imports: [
     BrowserModule,
     HttpModule,
     IonicModule.forRoot(MyApp),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -36,7 +42,8 @@ import{HttpModule} from '@angular/http';
     ItemDetailsPage,
     ListPage,
     DcPage,
-    ComicDetailsPage
+    ComicDetailsPage,
+    PullListPage
   ],
   providers: [
     StatusBar,

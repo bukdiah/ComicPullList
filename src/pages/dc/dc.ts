@@ -42,7 +42,7 @@ export class DcPage {
     });
   }
 
-    itemSelected(event, item) {
+  itemSelected(event, item) {
     console.log('item = ', item);
     this.navCtrl.push(ComicDetailsPage, {
       item: item
@@ -50,7 +50,7 @@ export class DcPage {
   }
 }
 
-interface Comic {
+export interface Comic {
   publisher: string,
   title: string, 
   price: string, 

@@ -27,4 +27,16 @@
   <p text-left *ngIf="selectedItem">
     {{selectedItem.description}}
   </p>
+  <div>
+  <button float-left ion-button icon-start (click)="addToPullList()">
+    <ion-icon name='add'></ion-icon>
+    Add to Pull List
+  </button>
+
+  <button float-right ion-button icon-start>
+    <ion-icon name='notifications'></ion-icon>
+    Notify New Issues
+  </button>
+</div>
+
 </ion-content>

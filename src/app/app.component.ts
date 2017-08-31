@@ -5,7 +5,7 @@ import { Platform, MenuController, Nav } from 'ionic-angular';
 import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import { ListPage } from '../pages/list/list';
 import {DcPage} from '../pages/dc/dc';
-
+import {PullListPage} from '../pages/pull-list/pull-list';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -18,7 +18,7 @@ export class MyApp {
 
   // make HelloIonicPage the root (or first) page
   rootPage = HelloIonicPage;
-  pages: Array<{title: string, component: any}>;
+  pages: Array<{title: string, component: any, icon?: String}>;
 
   constructor(
     public platform: Platform,
@@ -32,7 +32,8 @@ export class MyApp {
     this.pages = [
       { title: 'Hello Ionic', component: HelloIonicPage },
       { title: 'My First List', component: ListPage },
-      {title: 'DC', component: DcPage}
+      {title: 'DC', component: DcPage/*, icon: 'list-box'*/},
+      {title: 'My Pull List', component: PullListPage, icon: 'list-box'}
     ];
   }
 
