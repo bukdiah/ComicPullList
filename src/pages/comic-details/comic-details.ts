@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, Platform } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
+import { LocalNotifications } from '@ionic-native/local-notifications';
+
 /**
  * Generated class for the ComicDetailsPage page.
  *
@@ -17,10 +19,21 @@ export class ComicDetailsPage {
   selectedItem: any;
   list: Comic[];
   added: boolean;
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
+  isSeries: boolean;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private localNotifications: LocalNotifications, public alertController: AlertController, private platform: Platform) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');
     //this.list = [];
+    console.log('indexof returned',this.selectedItem.title.indexOf('#') );
+    if(this.selectedItem.title.indexOf('#')=== -1) //returns -1 if it cannot find # symbol. Means it is NOT an ongoing comic series, but rather a TPB or something
+    {
+        this.isSeries = false;
+    }
+    else
+    {
+        this.isSeries = true;
+    }
   }
 
   ionViewDidLoad() {
@@ -58,6 +71,30 @@ export class ComicDetailsPage {
     
     //this.storage.set('pull-list', JSON.stringify(this.selectedItem));
     this.storage.set('pull-list', this.list);
+  }
+
+  notify(item) {
+    console.log("CLICK")
+    this.platform.ready().then(()=>{
+      this.localNotifications.schedule({
+        id:1,
+        text: "NOTIFIED SUCKA",
+        data: "test"
+      });
+    });
+    /*
+      this.localNotifications.schedule({
+        id:1,
+        text: "NOTIFIED SUCKA",
+        data: "test"
+      });
+
+      let alert = this.alertController.create({
+        title: 'Notification Set',
+        buttons: ['OK']
+      });
+
+      alert.present();*/
   }
 
 }

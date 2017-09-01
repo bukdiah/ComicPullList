@@ -17,6 +17,8 @@ import { ComicProvider } from '../providers/comic/comic';
 
 import{HttpModule} from '@angular/http';
 
+import { LocalNotifications } from '@ionic-native/local-notifications';
+
 import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
@@ -50,6 +52,7 @@ import { IonicStorageModule } from '@ionic/storage';
   providers: [
     StatusBar,
     SplashScreen,
+    LocalNotifications,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ComicProvider
   ]

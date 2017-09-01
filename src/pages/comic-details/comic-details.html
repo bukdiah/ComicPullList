@@ -36,8 +36,8 @@
     Add to Pull List
   </button>
 
-        <button ion-button icon-start>
-    <ion-icon name='notifications'></ion-icon>
+        <button [disabled]="!isSeries" ion-button icon-start>
+    <ion-icon name='notifications' (click)="notify(selectedItem)"></ion-icon>
     Notify New Issues
   </button>
     </div>
