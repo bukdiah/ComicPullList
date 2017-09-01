@@ -10,6 +10,7 @@ import {PullListPage} from '../pages/pull-list/pull-list';
 import {AllPage} from '../pages/all/all';
 import {MarvelPage} from '../pages/marvel/marvel';
 import {ImagePage} from '../pages/image/image';
+import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -30,7 +31,8 @@ import { IonicStorageModule } from '@ionic/storage';
     PullListPage,
     AllPage,
     MarvelPage,
-    ImagePage
+    ImagePage,
+    BookmarksPage
   ],
   imports: [
     BrowserModule,
@@ -47,7 +49,8 @@ import { IonicStorageModule } from '@ionic/storage';
     PullListPage,
     AllPage,
     MarvelPage,
-    ImagePage
+    ImagePage,
+    BookmarksPage
   ],
   providers: [
     StatusBar,

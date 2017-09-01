@@ -66,5 +66,6 @@ export interface Comic {
   creators: string, 
   release_date: string, 
   diamond_id: string,
-  cover_url?: string
+  cover_url?: string,
+  bookmarked?: boolean
 }

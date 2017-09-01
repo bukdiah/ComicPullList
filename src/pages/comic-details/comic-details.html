@@ -15,7 +15,6 @@
 
 </ion-header>
 
-
 <ion-content padding>
     <h3 text-center *ngIf="selectedItem">
         {{selectedItem.title}}
@@ -32,14 +31,13 @@
     </p>
     <div text-center>
         <button [disabled]="added" ion-button icon-start (click)="addToPullList()">
-    <ion-icon name='add'></ion-icon>
-    Add to Pull List
-  </button>
+            <ion-icon name='add'></ion-icon>
+            Add to Pull List
+        </button>
 
-        <button [disabled]="!isSeries" ion-button icon-start>
-    <ion-icon name='notifications' (click)="notify(selectedItem)"></ion-icon>
-    Notify New Issues
-  </button>
+        <button [disabled]="!isSeries" ion-button icon-start (click)="bookmark(selectedItem)">
+            <ion-icon name='bookmark'></ion-icon>
+            Bookmark Series
+        </button>
     </div>
-
 </ion-content>

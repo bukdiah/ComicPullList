@@ -7,6 +7,7 @@ import {DcPage} from '../pages/dc/dc';
 import {PullListPage} from '../pages/pull-list/pull-list';
 import {MarvelPage} from '../pages/marvel/marvel';
 import {ImagePage} from '../pages/image/image';
+import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -38,7 +39,8 @@ export class MyApp {
       {title: 'DC', component: DcPage, icon: 'appname-dc'},
       {title: 'Marvel', component: MarvelPage, icon: 'appname-marvel'},
       {title: 'Image', component: ImagePage, icon: 'appname-image'},
-      {title: 'My Pull List', component: PullListPage, icon: 'list-box'}
+      {title: 'My Pull List', component: PullListPage, icon: 'list-box'},
+      {title: 'My Bookmarks', component: BookmarksPage, icon: 'bookmarks'}
     ];
   }
 

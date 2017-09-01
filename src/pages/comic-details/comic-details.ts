@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams} from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { LocalNotifications } from '@ionic-native/local-notifications';
+//import { LocalNotifications } from '@ionic-native/local-notifications';
 
 /**
  * Generated class for the ComicDetailsPage page.
@@ -20,8 +20,9 @@ export class ComicDetailsPage {
   list: Comic[];
   added: boolean;
   isSeries: boolean;
+  bookmarks: string[];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private localNotifications: LocalNotifications, public alertController: AlertController, private platform: Platform) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');
     //this.list = [];
@@ -60,6 +61,29 @@ export class ComicDetailsPage {
         this.added = false;
       }
     });
+
+    //Retrieve Bookmarks
+    this.storage.get('bookmarks').then((data)=>{
+      if(data != null)
+      {
+        this.bookmarks = data;
+        //Find # symbol
+        var poundIndex = this.selectedItem.title.indexOf('#');
+
+        for (var title of this.bookmarks)
+        {
+          if (title === this.selectedItem.title.slice(0,poundIndex))
+          {
+            console.log("SERIES ALREADY BOOKMARKED", title);
+            this.selectedItem.bookmarked = true;
+            this.isSeries = !this.selectedItem.bookmarked;
+          }
+        }
+      }
+      else{
+        this.bookmarks = [];
+      }
+    });
   }
 
   addToPullList(){
@@ -73,28 +97,32 @@ export class ComicDetailsPage {
     this.storage.set('pull-list', this.list);
   }
 
-  notify(item) {
-    console.log("CLICK")
+  bookmark(item) {
+    console.log("CLICK");
+
+    let booked: boolean = true;
+    this.isSeries = !booked;
+
+    let poundIndex = item.title.indexOf('#');
+
+    //We found the # sign, so it's an ongoing series
+    if (poundIndex !== -1)
+    {
+      let seriesTitle: string = item.title.slice(0,poundIndex);
+      this.bookmarks.push(seriesTitle);
+
+      //save to Storage
+      this.storage.set('bookmarks', this.bookmarks);
+    }
+    //this.isSeries = true;
+    /*
     this.platform.ready().then(()=>{
       this.localNotifications.schedule({
         id:1,
         text: "NOTIFIED SUCKA",
         data: "test"
       });
-    });
-    /*
-      this.localNotifications.schedule({
-        id:1,
-        text: "NOTIFIED SUCKA",
-        data: "test"
-      });
-
-      let alert = this.alertController.create({
-        title: 'Notification Set',
-        buttons: ['OK']
-      });
-
-      alert.present();*/
+    });*/
   }
 
 }
@@ -108,5 +136,6 @@ interface Comic {
   release_date: string, 
   diamond_id: string,
   cover_url?: string,
-  added?: boolean
+  added?: boolean,
+  bookmarked?: boolean
 }
