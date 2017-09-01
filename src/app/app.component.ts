@@ -34,11 +34,11 @@ export class MyApp {
 
     // set our app's pages
     this.pages = [
-      { title: 'Main', component: HelloIonicPage },
+      { title: 'Home', component: HelloIonicPage, icon: 'home' },
       {title: 'All', component: AllPage, icon: 'book'},
-      {title: 'DC', component: DcPage, icon: 'ai-dc'},
-      {title: 'Marvel', component: MarvelPage/*, icon: 'list-box'*/},
-      {title: 'Image', component: ImagePage/*, icon: 'list-box'*/},
+      {title: 'DC', component: DcPage, icon: 'appname-dc'},
+      {title: 'Marvel', component: MarvelPage, icon: 'appname-marvel'},
+      {title: 'Image', component: ImagePage, icon: 'appname-image'},
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'}
     ];
   }

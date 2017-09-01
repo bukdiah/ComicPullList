@@ -25,6 +25,9 @@
         By: {{selectedItem.creators}}
     </p>
     <p text-left *ngIf="selectedItem">
+        Pub. Date: {{selectedItem.release_date}}
+    </p>
+    <p text-left *ngIf="selectedItem">
         {{selectedItem.description}}
     </p>
     <div text-center>
