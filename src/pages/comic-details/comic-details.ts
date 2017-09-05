@@ -20,7 +20,8 @@ export class ComicDetailsPage {
   list: Comic[];
   added: boolean;
   isSeries: boolean;
-  bookmarks: string[];
+  //bookmarks: string[];
+  bookmarks: Comic[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
     // If we navigated to this page, we will have an item available as a nav param
@@ -72,7 +73,7 @@ export class ComicDetailsPage {
 
         for (var title of this.bookmarks)
         {
-          if (title === this.selectedItem.title.slice(0,poundIndex))
+          if (title.series === this.selectedItem.title.slice(0,poundIndex))
           {
             console.log("SERIES ALREADY BOOKMARKED", title);
             this.selectedItem.bookmarked = true;
@@ -109,8 +110,10 @@ export class ComicDetailsPage {
     if (poundIndex !== -1)
     {
       let seriesTitle: string = item.title.slice(0,poundIndex);
-      this.bookmarks.push(seriesTitle);
+      item.series = seriesTitle;
 
+      //this.bookmarks.push(seriesTitle);
+      this.bookmarks.push(item);
       //save to Storage
       this.storage.set('bookmarks', this.bookmarks);
     }
@@ -137,5 +140,6 @@ interface Comic {
   diamond_id: string,
   cover_url?: string,
   added?: boolean,
-  bookmarked?: boolean
+  bookmarked?: boolean,
+  series?: string
 }

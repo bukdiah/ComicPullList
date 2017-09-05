@@ -8,7 +8,7 @@
 
     <ion-content>
         <ion-list>
-            <button ion-item *ngFor="let p of pages" (click)="openPage(p)">
+            <button ion-item *ngFor="let p of pages" [class.activeHightlight]="checkActive(p)" (click)="openPage(p)">
         <ion-icon [name]="p.icon" item-left></ion-icon>
         {{p.title}}
       </button>

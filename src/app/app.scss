@@ -36,3 +36,7 @@ ion-icon {
         mask-image: url(../assets/icon/image_logo.svg);
     }
 }
+
+.activeHightlight {
+    background-color: map-get($colors, light);
+}

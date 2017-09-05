@@ -14,6 +14,27 @@
 
 </ion-header>
 
+<ion-content>
+        <ion-list>
+            <ion-item-sliding *ngFor="let item of items">
+                <ion-item-options side="left">
+                    <button ion-button item-start color="danger" (click)="remove(item)">
+                        <ion-icon name="close"></ion-icon>
+                    </button>
+                </ion-item-options>
+                <ion-item>
+                <h2 text-left>{{item.title}}</h2>
+                <p>{{item.price}}</p>
+                </ion-item>
+                <ion-item-options>
+                    <button ion-button icon-start item-end (click)="itemSelected($event,item)">
+                        <ion-icon name='eye'></ion-icon>
+                        View
+                    </button>
+            </ion-item-options>
+            </ion-item-sliding>    
+        </ion-list>  
+    </ion-content>
 <!--
 <ion-content padding>
     <ion-list>
@@ -28,7 +49,7 @@
         </ion-item>
     </ion-list>
 </ion-content> -->
-
+<!--
 <ion-content>
     <ion-list>
         <ion-item *ngFor="let item of items">
@@ -44,4 +65,4 @@
             </button>
         </ion-item>
     </ion-list>
-</ion-content>
+</ion-content> -->

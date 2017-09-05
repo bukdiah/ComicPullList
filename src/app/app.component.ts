@@ -21,6 +21,7 @@ export class MyApp {
 
   // make HelloIonicPage the root (or first) page
   rootPage = HelloIonicPage;
+  activePage : any;
   //rootPage = AllPage;
   pages: Array<{title: string, component: any, icon?: String}>;
 
@@ -42,6 +43,8 @@ export class MyApp {
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'},
       {title: 'My Bookmarks', component: BookmarksPage, icon: 'bookmarks'}
     ];
+
+    this.activePage = this.pages[0];
   }
 
   initializeApp() {
@@ -58,5 +61,10 @@ export class MyApp {
     this.menu.close();
     // navigate to the new page if it is not the current page
     this.nav.setRoot(page.component);
+    this.activePage = page;
+  }
+
+  checkActive(page){
+    return page === this.activePage;
   }
 }
