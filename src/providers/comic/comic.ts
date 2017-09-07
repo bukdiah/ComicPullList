@@ -45,4 +45,11 @@ export class ComicProvider {
     return this.http.get(this.image_current_week_url)
     .map(res=>res.json());
   }
+
+  getSeries(title,creators)
+  {
+    let query_url = this.base_url+"/comics/v1/query?tile="+title+"&creators="+creators;
+    return this.http.get(query_url)
+    .map(res=>res.json());
+  }
 }

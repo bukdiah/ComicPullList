@@ -1,7 +1,9 @@
-import { Component} from '@angular/core';
+import { Component, ElementRef} from '@angular/core';
 import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import {ComicProvider} from '../../providers/comic/comic';
+import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 import * as moment from 'moment';
 
 @IonicPage()
@@ -10,16 +12,17 @@ import * as moment from 'moment';
   templateUrl: 'bookmarks.html',
 })
 export class BookmarksPage {
-  //bookmarks: string[];
   bookmarks: Comic[];
   notifications: any[] = [];
   days: any[];
-  toggled: boolean = true;
+  newIssues: Comic[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
   private localNotifications: LocalNotifications,
-  private platform: Platform, public alertCtrl: AlertController) {
+  private platform: Platform, public alertCtrl: AlertController, 
+  private comicProvider: ComicProvider, private elementRef: ElementRef) {
     this.bookmarks = [];
+    this.newIssues = [];
 
     this.days = [
       {title: 'Monday', dayCode: 1, checked: false},
@@ -33,12 +36,52 @@ export class BookmarksPage {
 
     this.platform.ready().then(()=>{
       this.localNotifications.on("trigger", (notif,state)=>{
-        alert(state);
-        alert(notif.comic)
-      });
-    });
 
-    
+        console.log('notif.data',notif.data);
+        let comic = JSON.parse(notif.data);
+        console.log('comic',comic);
+        console.log('comic.series',comic.series);
+
+        let series = comic.series;
+
+        let seriesID = comic.seriesID;
+
+        console.log('seriesID trim', seriesID.trim());
+
+        //Example of creators field: "(W) Gabby Rivera, Kelly Thompson (A) Ramon Villalobos (CA) Jen Bartel"
+        let creators = comic.creators;
+
+        let release_date = comic.release_date;
+        console.log('release_date',release_date);
+
+        //let start = creators.indexOf(')'); //Find the first ) symbol
+        let creators_array = creators.split(" ");
+        console.log('creators_array', creators_array);
+
+        this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
+          let comic = data.comics[0];
+          console.log(comic);
+          let selector = "#"+seriesID.trim()+"_alert";
+          console.log('selector',selector);
+
+          let nowDate = moment(new Date()).format("YYYY-MM-DD");
+
+          console.log('nowDate',nowDate);
+
+          //New Issues Found
+          if(nowDate === comic.release_date) {
+            this.newIssues.push(comic); //add new issue to array
+            this.elementRef.nativeElement.querySelector(selector).disabled = false;
+          } 
+          else
+          {
+            console.log('No new issues found for '+series);
+            this.elementRef.nativeElement.querySelector(selector).disabled = true;  
+          }
+
+        });
+      });
+    }); 
   }
 
   ionViewDidLoad() {
@@ -48,13 +91,6 @@ export class BookmarksPage {
       if (data != null)
         {
           this.bookmarks = data;
-          //console.log(this.bookmarks);
-/*
-          for (var series of this.bookmarks)
-            {
-              console.log("Series",series)
-            }
-*/
         }
     });
   }
@@ -77,15 +113,25 @@ export class BookmarksPage {
       this.storage.set('bookmarks', this.bookmarks);
   }
 
-  toggle(event, item)
-  {
-    console.log("event",event);
-    //el.nativeElement.querySelector('#'+event.srcElement)
-    this.toggled = !this.toggled;
+  itemSelected(event, item) {
+    console.log('item = ', item);
+
+    if(this.newIssues.length > 0)
+    {
+      this.newIssues.forEach((arrayItem)=>{
+        //if your bookmarked series matches a series in newIssues array
+        if (item.series === arrayItem.series) {
+          this.navCtrl.push(ComicDetailsPage, {item: arrayItem});
+        }
+      });
+    }
   }
+
   addNotification(event, item) {
     
     console.log('NOTIFIED');
+    console.log('item',item);
+    
     let currentDate = new Date();
     let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
 
@@ -114,9 +160,9 @@ export class BookmarksPage {
               id: day.dayCode,
               title: 'Hey!',
               text: 'There are new issues out! :)',
-              at: firstNotificationTime,
-              every: 'week',
-              data: {comic: item}
+              //at: firstNotificationTime,
+              //every: 'week',
+              data: item
             };
 
           this.notifications.push(notification);
@@ -144,9 +190,10 @@ export class BookmarksPage {
                 id: day.dayCode,
                 title: 'Hey!',
                 text: 'There are new issues out! :)',
-                at: firstNotificationTime,
-                every: 'minute',
-                data: {title: item.series}
+                //at: firstNotificationTime,
+                //every: 'week',
+                //data: {"series": item.series,"seriesID": item.seriesID, "creators": item.creators, "release_date": item.release_date}
+                data: item
               };
   
             this.notifications.push(notification);
@@ -174,19 +221,8 @@ export class BookmarksPage {
       
                  alert.present();
       
-             });
-      
+             });   
     }
-
-   /* 
-    this.platform.ready().then(()=>{
-      this.localNotifications.schedule({
-        id:1,
-        //sound: this.platform.is('Android') ? 'file://assets/sounds/arpeggio.mp3': 'file://assets/sounds/arpeggio.m4r',
-        text: "NOTIFIED SUCKA",
-        data: "test"
-      });
-    });*/
   }
 
   cancelNotifications(item){
@@ -196,10 +232,8 @@ export class BookmarksPage {
            title: 'Notifications cancelled',
            buttons: ['OK']
        });
-    
        alert.present();
   }
-
 }
 
 interface Comic {
@@ -213,5 +247,6 @@ interface Comic {
   cover_url?: string,
   added?: boolean,
   bookmarked?: boolean,
-  series?: string
+  series?: string,
+  seriesID?: string
 }

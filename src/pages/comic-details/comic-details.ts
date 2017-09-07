@@ -111,6 +111,7 @@ export class ComicDetailsPage {
     {
       let seriesTitle: string = item.title.slice(0,poundIndex);
       item.series = seriesTitle;
+      item.seriesID = seriesTitle.replace(" ","").trim();
 
       //this.bookmarks.push(seriesTitle);
       this.bookmarks.push(item);
@@ -141,5 +142,6 @@ interface Comic {
   cover_url?: string,
   added?: boolean,
   bookmarked?: boolean,
-  series?: string
+  series?: string,
+  seriesID?:string
 }
