@@ -17,7 +17,8 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 })
 export class AllPage {
   items : Comic[];
-  cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/200/';
+  //cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/200/'; //doesn't use diamond id for indie titles
+  cover_url ="http://cdn.nexternal.com/dreamland/images/"; //can find most covers using diamond id
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private loadingCtrl: LoadingController,
   private comicProvider: ComicProvider) {
@@ -42,9 +43,10 @@ export class AllPage {
     err=>console.log(err),
     ()=>{
       for (var comic of this.items) {
-        let d_id_slice = comic.diamond_id.slice(0,2);
+        //let d_id_slice = comic.diamond_id.slice(0,2);
         //console.log(d_id_slice);
-        comic.cover_url = this.cover_small_url+d_id_slice+"/"+comic.diamond_id+".jpg";
+        //comic.cover_url = this.cover_small_url+d_id_slice+"/"+comic.diamond_id+".jpg";
+        comic.cover_url = this.cover_url+comic.diamond_id+".jpg";
         //console.log('Cover URL',comic.cover_url);
       }
     });

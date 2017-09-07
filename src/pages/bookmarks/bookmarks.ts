@@ -4,6 +4,8 @@ import { Storage } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import {ComicProvider} from '../../providers/comic/comic';
 import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
+import {NotificationSettingsPage} from '../../pages/notification-settings/notification-settings';
+
 import * as moment from 'moment';
 
 @IonicPage()
@@ -131,7 +133,7 @@ export class BookmarksPage {
     
     console.log('NOTIFIED');
     console.log('item',item);
-    
+
     let currentDate = new Date();
     let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
 

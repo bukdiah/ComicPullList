@@ -11,6 +11,7 @@ import {AllPage} from '../pages/all/all';
 import {MarvelPage} from '../pages/marvel/marvel';
 import {ImagePage} from '../pages/image/image';
 import {BookmarksPage} from '../pages/bookmarks/bookmarks';
+import {NotificationSettingsPage} from '../pages/notification-settings/notification-settings';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -32,7 +33,8 @@ import { IonicStorageModule } from '@ionic/storage';
     AllPage,
     MarvelPage,
     ImagePage,
-    BookmarksPage
+    BookmarksPage,
+    NotificationSettingsPage
   ],
   imports: [
     BrowserModule,
@@ -50,7 +52,8 @@ import { IonicStorageModule } from '@ionic/storage';
     AllPage,
     MarvelPage,
     ImagePage,
-    BookmarksPage
+    BookmarksPage,
+    NotificationSettingsPage
   ],
   providers: [
     StatusBar,
