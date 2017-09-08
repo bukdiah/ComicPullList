@@ -1,12 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-
-/**
- * Generated class for the NotificationSettingsPage page.
- *
- * See http://ionicframework.com/docs/components/#navigation for more info
- * on Ionic pages and navigation.
- */
+import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
+import * as moment from 'moment';
 
 @IonicPage()
 @Component({
@@ -14,12 +8,36 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
   templateUrl: 'notification-settings.html',
 })
 export class NotificationSettingsPage {
+  notifyTime: any;
+  chosenHours: number;
+  chosenMinutes: number;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController) {
+    
+    this.notifyTime = moment(new Date()).format();
+    this.chosenHours = new Date().getHours();
+    this.chosenMinutes = new Date().getMinutes();
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad NotificationSettingsPage');
+  }
+
+  dismiss() {
+
+    let data = {
+      "notifyTime": this.notifyTime,
+      "chosenHours": this.chosenHours,
+      "chosenMinutes": this.chosenMinutes
+    }
+
+    this.viewCtrl.dismiss(data);
+  }
+
+  timeChange(time) {
+    console.log('timeChange called',time);
+    this.chosenHours = time.hour;
+    this.chosenMinutes = time.minute;
   }
 
 }

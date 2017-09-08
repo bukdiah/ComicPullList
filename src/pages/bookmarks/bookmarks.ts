@@ -1,5 +1,5 @@
 import { Component, ElementRef} from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController,ModalController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import {ComicProvider} from '../../providers/comic/comic';
@@ -18,11 +18,13 @@ export class BookmarksPage {
   notifications: any[] = [];
   days: any[];
   newIssues: Comic[];
+  chosenHours: number;
+  chosenMinutes: number;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
   private localNotifications: LocalNotifications,
   private platform: Platform, public alertCtrl: AlertController, 
-  private comicProvider: ComicProvider, private elementRef: ElementRef) {
+  private comicProvider: ComicProvider, private elementRef: ElementRef, public modalCtrl: ModalController) {
     this.bookmarks = [];
     this.newIssues = [];
 
@@ -134,7 +136,16 @@ export class BookmarksPage {
     console.log('NOTIFIED');
     console.log('item',item);
 
-    let currentDate = new Date();
+    //Create modal to retrieve user inputed time!
+    let modal = this.modalCtrl.create(NotificationSettingsPage, item);
+    
+    modal.onDidDismiss((data)=>{
+      console.log(data);
+
+      this.chosenHours = data.chosenHours;
+      this.chosenMinutes = data.chosenMinutes;
+
+let currentDate = new Date();
     let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
 
     //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
@@ -146,16 +157,11 @@ export class BookmarksPage {
           {
             let firstNotificationTime = new Date();
             let dayDifference = 0;
-            /*
-            if(dayDifference < 0)
-            {
-              dayDifference = dayDifference + 7; //for cases where the day is in the following week
-            }*/
 
             firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
-            //Will be notified at 12PM
-            firstNotificationTime.setHours(12);
-            firstNotificationTime.setMinutes(0);
+            //Will be notified at this time
+            firstNotificationTime.setHours(this.chosenHours);
+            firstNotificationTime.setMinutes(this.chosenMinutes);
 
             console.log('firstNotificationTime',firstNotificationTime)
             let notification = {
@@ -183,9 +189,99 @@ export class BookmarksPage {
                 dayDifference = dayDifference + 7; //for cases where the day is in the following week
               }  
               firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
-              //Will be notified at 12PM
-              firstNotificationTime.setHours(12);
-              firstNotificationTime.setMinutes(0);
+              //Will be notified at this time
+              firstNotificationTime.setHours(this.chosenHours);
+              firstNotificationTime.setMinutes(this.chosenMinutes);
+  
+              console.log('firstNotificationTime',firstNotificationTime)
+              let notification = {
+                id: day.dayCode,
+                title: 'Hey!',
+                text: 'There are new issues out! :)',
+                //at: firstNotificationTime,
+                //every: 'week',
+                //data: {"series": item.series,"seriesID": item.seriesID, "creators": item.creators, "release_date": item.release_date}
+                data: item
+              };
+  
+            this.notifications.push(notification);
+          }
+        }
+    }
+    console.log("Notifications to be scheduled: ", this.notifications);
+
+     
+    if(this.platform.is('cordova')){
+      
+             // Cancel any existing notifications
+             this.localNotifications.cancelAll().then(() => {
+      
+                 // Schedule the new notifications
+                 this.localNotifications.schedule(this.notifications);
+      
+                 this.notifications = [];
+      
+                 let alert = this.alertCtrl.create({
+                     title: 'Notifications set',
+                     buttons: ['OK']
+                 });
+      
+                 alert.present();
+      
+             });   
+    }
+    });
+    
+    modal.present();
+
+    /*
+    let currentDate = new Date();
+    let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
+
+    //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
+    
+    for (let day of this.days)
+    {
+          //If the current Day is Wednesday
+          if (currentDay === 3)
+          {
+            let firstNotificationTime = new Date();
+            let dayDifference = 0;
+
+            firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
+            //Will be notified at this time
+            firstNotificationTime.setHours(this.chosenHours);
+            firstNotificationTime.setMinutes(this.chosenMinutes);
+
+            console.log('firstNotificationTime',firstNotificationTime)
+            let notification = {
+              id: day.dayCode,
+              title: 'Hey!',
+              text: 'There are new issues out! :)',
+              //at: firstNotificationTime,
+              //every: 'week',
+              data: item
+            };
+
+          this.notifications.push(notification);
+          }
+          else
+          {
+            if(currentDay === day.dayCode)
+            {
+              let firstNotificationTime = new Date();
+              //let dayDifference = day.dayCode - currentDay; //Find difference in days since Wednesday
+              let dayDifference = 3 - currentDay;
+              console.log("dayDifference", dayDifference);
+
+              if(dayDifference < 0)
+              {
+                dayDifference = dayDifference + 7; //for cases where the day is in the following week
+              }  
+              firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
+              //Will be notified at this time
+              firstNotificationTime.setHours(this.chosenHours);
+              firstNotificationTime.setMinutes(this.chosenMinutes);
   
               console.log('firstNotificationTime',firstNotificationTime)
               let notification = {
@@ -200,7 +296,7 @@ export class BookmarksPage {
   
             this.notifications.push(notification);
             }
-          }
+          
     }
 
     console.log("Notifications to be scheduled: ", this.notifications);
@@ -225,9 +321,10 @@ export class BookmarksPage {
       
              });   
     }
-  }
+  }*/
+}
 
-  cancelNotifications(item){
+cancelNotifications(item){
     this.localNotifications.cancelAll();
     
        let alert = this.alertCtrl.create({
