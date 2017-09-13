@@ -15,6 +15,7 @@
 </ion-header>
 
 <ion-content>
+    <p *ngIf="items.length === 0 || items === null" text-center>You have nothing in your pull list!</p>
         <ion-list>
             <ion-item-sliding *ngFor="let item of items">
                 <ion-item-options side="left">

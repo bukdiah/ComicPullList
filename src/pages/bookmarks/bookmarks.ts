@@ -40,7 +40,7 @@ export class BookmarksPage {
 
     this.platform.ready().then(()=>{
       this.localNotifications.on("trigger", (notif,state)=>{
-
+        
         console.log('notif.data',notif.data);
         let comic = JSON.parse(notif.data);
         console.log('comic',comic);
@@ -113,6 +113,20 @@ export class BookmarksPage {
             this.bookmarks.splice(i,1);
           }
       }
+    
+      for (var j = 0; j<this.notifications.length; j++){
+        let arrayItem = this.notifications[j];
+        let comic = JSON.parse(arrayItem.data);
+    
+        if(item.seriesID === comic.seriesID)
+        {
+          console.log("MATCH FOOL! cancelling notification # "+arrayItem.id);
+          this.localNotifications.cancel(arrayItem.id);
+          this.notifications.splice(j,1);
+        }
+      }
+      //this.localNotifications.cancelAll();
+      console.log("Notifications remaining: ", this.notifications);
 
       this.storage.set('bookmarks', this.bookmarks);
   }
@@ -145,193 +159,109 @@ export class BookmarksPage {
       this.chosenHours = data.chosenHours;
       this.chosenMinutes = data.chosenMinutes;
 
-let currentDate = new Date();
-    let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
+      let currentDate = new Date();
+      let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
 
-    //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
-    
-    for (let day of this.days)
-    {
-          //If the current Day is Wednesday
-          if (currentDay === 3)
+      //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
+      
+      for (let day of this.days)
+      {
+        //If the current Day is Wednesday
+        if (currentDay === 3)
+        {
+          let firstNotificationTime = new Date();
+          let dayDifference = 0;
+
+          firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
+          //Will be notified at this time
+          firstNotificationTime.setHours(this.chosenHours);
+          firstNotificationTime.setMinutes(this.chosenMinutes);
+
+          console.log('firstNotificationTime',firstNotificationTime)
+          let notification = {
+            id: day.dayCode + Math.floor(Math.random()*101),
+            title: 'Hey!',
+            text: 'New issues for '+item.series+'! :)',
+            at: firstNotificationTime,
+            every: 'week',
+            data: item
+          };
+
+        this.notifications.push(notification);
+        }
+        else
+        {
+          if(currentDay === day.dayCode)
           {
             let firstNotificationTime = new Date();
-            let dayDifference = 0;
+            //let dayDifference = day.dayCode - currentDay; //Find difference in days since Wednesday
+            let dayDifference = 3 - currentDay;
+            console.log("dayDifference", dayDifference);
 
-            firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
+            if(dayDifference < 0)
+            {
+              dayDifference = dayDifference + 7; //for cases where the day is in the following week
+            }  
+            firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
             //Will be notified at this time
             firstNotificationTime.setHours(this.chosenHours);
             firstNotificationTime.setMinutes(this.chosenMinutes);
 
             console.log('firstNotificationTime',firstNotificationTime)
             let notification = {
-              id: day.dayCode,
+              id: day.dayCode + Math.floor(Math.random()*101),
               title: 'Hey!',
-              text: 'There are new issues out! :)',
-              //at: firstNotificationTime,
-              //every: 'week',
+              text: 'New issues for '+item.series+'! :)',
+              at: firstNotificationTime,
+              every: 'week',
               data: item
             };
 
           this.notifications.push(notification);
           }
-          else
-          {
-            if(currentDay === day.dayCode)
-            {
-              let firstNotificationTime = new Date();
-              //let dayDifference = day.dayCode - currentDay; //Find difference in days since Wednesday
-              let dayDifference = 3 - currentDay;
-              console.log("dayDifference", dayDifference);
-
-              if(dayDifference < 0)
-              {
-                dayDifference = dayDifference + 7; //for cases where the day is in the following week
-              }  
-              firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
-              //Will be notified at this time
-              firstNotificationTime.setHours(this.chosenHours);
-              firstNotificationTime.setMinutes(this.chosenMinutes);
-  
-              console.log('firstNotificationTime',firstNotificationTime)
-              let notification = {
-                id: day.dayCode,
-                title: 'Hey!',
-                text: 'There are new issues out! :)',
-                //at: firstNotificationTime,
-                //every: 'week',
-                //data: {"series": item.series,"seriesID": item.seriesID, "creators": item.creators, "release_date": item.release_date}
-                data: item
-              };
-  
-            this.notifications.push(notification);
-          }
         }
-    }
-    console.log("Notifications to be scheduled: ", this.notifications);
+      }
+      console.log("Notifications to be scheduled: ", this.notifications);
 
-     
-    if(this.platform.is('cordova')){
       
-             // Cancel any existing notifications
-             this.localNotifications.cancelAll().then(() => {
-      
-                 // Schedule the new notifications
-                 this.localNotifications.schedule(this.notifications);
-      
-                 this.notifications = [];
-      
-                 let alert = this.alertCtrl.create({
-                     title: 'Notifications set',
-                     buttons: ['OK']
-                 });
-      
-                 alert.present();
-      
-             });   
-    }
+      if(this.platform.is('cordova')){        
+        // Cancel any existing notifications
+        this.localNotifications.cancelAll().then(() => {
+          // Schedule the new notifications
+          this.localNotifications.schedule(this.notifications);
+          //this.notifications = [];
+          let alert = this.alertCtrl.create({
+              title: 'Notifications set',
+              buttons: ['OK']
+          });
+          alert.present();
+        });   
+      }
     });
     
     modal.present();
-
-    /*
-    let currentDate = new Date();
-    let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
-
-    //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
-    
-    for (let day of this.days)
-    {
-          //If the current Day is Wednesday
-          if (currentDay === 3)
-          {
-            let firstNotificationTime = new Date();
-            let dayDifference = 0;
-
-            firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
-            //Will be notified at this time
-            firstNotificationTime.setHours(this.chosenHours);
-            firstNotificationTime.setMinutes(this.chosenMinutes);
-
-            console.log('firstNotificationTime',firstNotificationTime)
-            let notification = {
-              id: day.dayCode,
-              title: 'Hey!',
-              text: 'There are new issues out! :)',
-              //at: firstNotificationTime,
-              //every: 'week',
-              data: item
-            };
-
-          this.notifications.push(notification);
-          }
-          else
-          {
-            if(currentDay === day.dayCode)
-            {
-              let firstNotificationTime = new Date();
-              //let dayDifference = day.dayCode - currentDay; //Find difference in days since Wednesday
-              let dayDifference = 3 - currentDay;
-              console.log("dayDifference", dayDifference);
-
-              if(dayDifference < 0)
-              {
-                dayDifference = dayDifference + 7; //for cases where the day is in the following week
-              }  
-              firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
-              //Will be notified at this time
-              firstNotificationTime.setHours(this.chosenHours);
-              firstNotificationTime.setMinutes(this.chosenMinutes);
-  
-              console.log('firstNotificationTime',firstNotificationTime)
-              let notification = {
-                id: day.dayCode,
-                title: 'Hey!',
-                text: 'There are new issues out! :)',
-                //at: firstNotificationTime,
-                //every: 'week',
-                //data: {"series": item.series,"seriesID": item.seriesID, "creators": item.creators, "release_date": item.release_date}
-                data: item
-              };
-  
-            this.notifications.push(notification);
-            }
-          
-    }
-
-    console.log("Notifications to be scheduled: ", this.notifications);
-
-     
-    if(this.platform.is('cordova')){
-      
-             // Cancel any existing notifications
-             this.localNotifications.cancelAll().then(() => {
-      
-                 // Schedule the new notifications
-                 this.localNotifications.schedule(this.notifications);
-      
-                 this.notifications = [];
-      
-                 let alert = this.alertCtrl.create({
-                     title: 'Notifications set',
-                     buttons: ['OK']
-                 });
-      
-                 alert.present();
-      
-             });   
-    }
-  }*/
 }
 
 cancelNotifications(item){
-    this.localNotifications.cancelAll();
-    
-       let alert = this.alertCtrl.create({
-           title: 'Notifications cancelled',
-           buttons: ['OK']
-       });
-       alert.present();
+  for (var i = 0; i<this.notifications.length; i++){
+    let arrayItem = this.notifications[i];
+    let comic = JSON.parse(arrayItem.data);
+
+    if(item.seriesID === comic.seriesID)
+    {
+      console.log("MATCH FOOL! cancelling notification # "+arrayItem.id);
+      this.localNotifications.cancel(arrayItem.id);
+      this.notifications.splice(i,1);
+    }
+  }
+  //this.localNotifications.cancelAll();
+  console.log("Notifications remaining: ", this.notifications);
+  
+      let alert = this.alertCtrl.create({
+          title: 'Notifications cancelled',
+          buttons: ['OK']
+      });
+      alert.present();
   }
 }
 

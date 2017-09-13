@@ -9,6 +9,7 @@
 </ion-header>
 
 <ion-content>
+    <p *ngIf="bookmarks.length === 0 || bookmarks === null" text-center>No bookmarks found.</p>
     <ion-list>
         <ion-item-sliding *ngFor="let series of bookmarks">
             <ion-item-options side="left">
