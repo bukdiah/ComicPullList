@@ -46,7 +46,7 @@ export class BookmarksPage {
         console.log('comic',comic);
         console.log('comic.series',comic.series);
 
-        let series = comic.series;
+        let series = comic.series.trim();
 
         let seriesID = comic.seriesID;
 
@@ -63,6 +63,35 @@ export class BookmarksPage {
         console.log('creators_array', creators_array);
 
         this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
+          console.log('data getSeries',data);
+
+          let results = data.comics;
+
+          results.forEach((arrayItem)=>{
+            if (arrayItem.title.includes(series) && arrayItem.creators === creators){
+                console.log('Found correct comic!', arrayItem);
+
+                let selector = "#"+seriesID.trim()+"_alert";
+                console.log('selector',selector);
+      
+                let nowDate = moment(new Date()).format("YYYY-MM-DD");
+      
+                console.log('nowDate',nowDate);
+      
+                //New Issues Found
+                if(nowDate === comic.release_date) {
+                  this.newIssues.push(arrayItem); //add new issue to array
+                  console.log('newIssues notify',this.newIssues);            
+                  this.elementRef.nativeElement.querySelector(selector).disabled = false;
+                } 
+                else
+                {
+                  console.log('No new issues found for '+series);
+                  this.elementRef.nativeElement.querySelector(selector).disabled = true;  
+                }
+            }
+          });
+          /*
           let comic = data.comics[0];
           console.log(comic);
           let selector = "#"+seriesID.trim()+"_alert";
@@ -75,6 +104,7 @@ export class BookmarksPage {
           //New Issues Found
           if(nowDate === comic.release_date) {
             this.newIssues.push(comic); //add new issue to array
+            console.log('newIssues notify',this.newIssues);            
             this.elementRef.nativeElement.querySelector(selector).disabled = false;
           } 
           else
@@ -82,7 +112,7 @@ export class BookmarksPage {
             console.log('No new issues found for '+series);
             this.elementRef.nativeElement.querySelector(selector).disabled = true;  
           }
-
+          */
         });
       });
     }); 
@@ -133,16 +163,14 @@ export class BookmarksPage {
 
   itemSelected(event, item) {
     console.log('item = ', item);
+    console.log('newIssues',this.newIssues);
 
-    if(this.newIssues.length > 0)
-    {
-      this.newIssues.forEach((arrayItem)=>{
-        //if your bookmarked series matches a series in newIssues array
-        if (item.series === arrayItem.series) {
-          this.navCtrl.push(ComicDetailsPage, {item: arrayItem});
-        }
-      });
-    }
+    this.newIssues.forEach((arrayItem)=>{
+      //if your bookmarked series matches a series in newIssues array
+      if (arrayItem.title.includes(item.series) && arrayItem.creators === item.creators) {
+        this.navCtrl.push(ComicDetailsPage, {item: item});
+      }
+    });
   }
 
   addNotification(event, item) {
@@ -169,6 +197,8 @@ export class BookmarksPage {
         //If the current Day is Wednesday
         if (currentDay === 3)
         {
+          console.log('current day = '+currentDay+" day is "+day);
+
           let firstNotificationTime = new Date();
           let dayDifference = 0;
 
@@ -188,9 +218,11 @@ export class BookmarksPage {
           };
 
         this.notifications.push(notification);
+        break;
         }
         else
         {
+          console.log('ELSE BLOCK')
           if(currentDay === day.dayCode)
           {
             let firstNotificationTime = new Date();
@@ -218,6 +250,7 @@ export class BookmarksPage {
             };
 
           this.notifications.push(notification);
+          break;
           }
         }
       }

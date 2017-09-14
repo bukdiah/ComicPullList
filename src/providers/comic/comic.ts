@@ -49,7 +49,8 @@ export class ComicProvider {
   getSeries(title,creators)
   {
     let query_url = this.base_url+"/comics/v1/query?tile="+title+"&creators="+creators;
-    return this.http.get(query_url)
+    console.log('query_url',query_url.trim());
+    return this.http.get(query_url.trim())
     .map(res=>res.json());
   }
 }
