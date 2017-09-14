@@ -5,6 +5,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 import {ComicProvider} from '../../providers/comic/comic';
 import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 import {NotificationSettingsPage} from '../../pages/notification-settings/notification-settings';
+import {ViewNotificationsPage} from '../../pages/view-notifications/view-notifications';
 
 import * as moment from 'moment';
 
@@ -15,7 +16,7 @@ import * as moment from 'moment';
 })
 export class BookmarksPage {
   bookmarks: Comic[];
-  notifications: any[] = [];
+  notifications: any[];
   days: any[];
   newIssues: Comic[];
   chosenHours: number;
@@ -27,6 +28,7 @@ export class BookmarksPage {
   private comicProvider: ComicProvider, private elementRef: ElementRef, public modalCtrl: ModalController) {
     this.bookmarks = [];
     this.newIssues = [];
+    this.notifications = [];
 
     this.days = [
       {title: 'Monday', dayCode: 1, checked: false},
@@ -91,28 +93,6 @@ export class BookmarksPage {
                 }
             }
           });
-          /*
-          let comic = data.comics[0];
-          console.log(comic);
-          let selector = "#"+seriesID.trim()+"_alert";
-          console.log('selector',selector);
-
-          let nowDate = moment(new Date()).format("YYYY-MM-DD");
-
-          console.log('nowDate',nowDate);
-
-          //New Issues Found
-          if(nowDate === comic.release_date) {
-            this.newIssues.push(comic); //add new issue to array
-            console.log('newIssues notify',this.newIssues);            
-            this.elementRef.nativeElement.querySelector(selector).disabled = false;
-          } 
-          else
-          {
-            console.log('No new issues found for '+series);
-            this.elementRef.nativeElement.querySelector(selector).disabled = true;  
-          }
-          */
         });
       });
     }); 
@@ -126,6 +106,12 @@ export class BookmarksPage {
         {
           this.bookmarks = data;
         }
+    });
+
+    this.storage.get('notifications').then((data)=>{
+      if (data != null) {
+        this.notifications = data;
+      }
     });
   }
 
@@ -146,17 +132,21 @@ export class BookmarksPage {
     
       for (var j = 0; j<this.notifications.length; j++){
         let arrayItem = this.notifications[j];
-        let comic = JSON.parse(arrayItem.data);
-    
-        if(item.seriesID === comic.seriesID)
+        //let comic = JSON.parse(arrayItem.data);
+        let comic = arrayItem;
+
+        console.log('looping thru notifications in remove()',comic);
+        
+        if(comic.text.includes(item.series))
         {
           console.log("MATCH FOOL! cancelling notification # "+arrayItem.id);
           this.localNotifications.cancel(arrayItem.id);
           this.notifications.splice(j,1);
         }
       }
-      //this.localNotifications.cancelAll();
       console.log("Notifications remaining: ", this.notifications);
+
+      this.storage.set('notifications',this.notifications); //saving notifications to local storage
 
       this.storage.set('bookmarks', this.bookmarks);
   }
@@ -256,6 +246,7 @@ export class BookmarksPage {
       }
       console.log("Notifications to be scheduled: ", this.notifications);
 
+      this.storage.set('notifications',this.notifications);
       
       if(this.platform.is('cordova')){        
         // Cancel any existing notifications
@@ -264,7 +255,7 @@ export class BookmarksPage {
           this.localNotifications.schedule(this.notifications);
           //this.notifications = [];
           let alert = this.alertCtrl.create({
-              title: 'Notifications set',
+              title: 'Notification set for '+item.series,
               buttons: ['OK']
           });
           alert.present();
@@ -278,24 +269,49 @@ export class BookmarksPage {
 cancelNotifications(item){
   for (var i = 0; i<this.notifications.length; i++){
     let arrayItem = this.notifications[i];
-    let comic = JSON.parse(arrayItem.data);
-
-    if(item.seriesID === comic.seriesID)
+    //let comic = JSON.parse(arrayItem.data);
+    let comic = arrayItem;
+    console.log('looping thru notifications in cancelNotifications()',comic);
+    
+    if(comic.text.includes(item.series))
     {
       console.log("MATCH FOOL! cancelling notification # "+arrayItem.id);
       this.localNotifications.cancel(arrayItem.id);
       this.notifications.splice(i,1);
-    }
+    }    
   }
   //this.localNotifications.cancelAll();
   console.log("Notifications remaining: ", this.notifications);
-  
+  this.storage.set('notifications',this.notifications);
+
       let alert = this.alertCtrl.create({
-          title: 'Notifications cancelled',
+          title: 'Notification cancelled for '+item.series,
           buttons: ['OK']
       });
       alert.present();
   }
+
+  cancelAll()
+  {
+    this.localNotifications.cancelAll();
+    this.notifications = [];
+
+    this.storage.set('notifications',this.notifications);
+
+    let alert = this.alertCtrl.create({
+        title: 'Notifications cancelled',
+        buttons: ['OK']
+    });
+ 
+    alert.present();   
+  }
+
+  viewNotifications(){
+    //this.navCtrl.push(ViewNotificationsPage,{item:this.notifications});
+        this.navCtrl.push(ViewNotificationsPage);
+
+  }
+
 }
 
 interface Comic {

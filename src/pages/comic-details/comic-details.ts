@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams} from 'ionic-angular';
+import { IonicPage, NavController, NavParams,LoadingController} from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 //import { LocalNotifications } from '@ionic-native/local-notifications';
 
@@ -23,7 +23,7 @@ export class ComicDetailsPage {
   //bookmarks: string[];
   bookmarks: Comic[];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private loadingCtrl: LoadingController) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');
     //this.list = [];
@@ -41,7 +41,16 @@ export class ComicDetailsPage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad ComicDetailsPage');
 
-    this.storage.get('pull-list').then((data)=>{
+    //Create the loading popup
+    let loadingPopup = this.loadingCtrl.create({
+      content: 'Loading Comic...'
+    });
+
+    //Show the pop up
+    loadingPopup.present();
+
+    //Retrieve pull list
+    let pull_list_retrieve = this.storage.get('pull-list').then((data)=>{
       if (data != null)
         {
           this.list = data;
@@ -64,7 +73,7 @@ export class ComicDetailsPage {
     });
 
     //Retrieve Bookmarks
-    this.storage.get('bookmarks').then((data)=>{
+    let bookmark_retrieve=this.storage.get('bookmarks').then((data)=>{
       if(data != null)
       {
         this.bookmarks = data;
@@ -84,6 +93,13 @@ export class ComicDetailsPage {
       else{
         this.bookmarks = [];
       }
+    });
+
+    Promise.all([
+      pull_list_retrieve,
+      bookmark_retrieve
+    ]).then((data)=>{
+      loadingPopup.dismiss();
     });
   }
 
