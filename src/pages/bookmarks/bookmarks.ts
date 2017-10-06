@@ -17,7 +17,7 @@ import * as moment from 'moment';
 export class BookmarksPage {
   bookmarks: Comic[];
   notifications: any[];
-  days: any[];
+  //days: any[];
   newIssues: Comic[];
   chosenHours: number;
   chosenMinutes: number;
@@ -29,7 +29,7 @@ export class BookmarksPage {
     this.bookmarks = [];
     this.newIssues = [];
     this.notifications = [];
-
+    /*
     this.days = [
       {title: 'Monday', dayCode: 1, checked: false},
       {title: 'Tuesday', dayCode: 2, checked: false},
@@ -38,7 +38,7 @@ export class BookmarksPage {
       {title: 'Friday', dayCode: 5, checked: false},
       {title: 'Saturday', dayCode: 6, checked: false},
       {title: 'Sunday', dayCode: 0, checked: false}
-    ];
+    ];*/
 
     this.platform.ready().then(()=>{
       this.localNotifications.on("trigger", (notif,state)=>{
@@ -170,6 +170,8 @@ export class BookmarksPage {
 
     //Create modal to retrieve user inputed time!
     let modal = this.modalCtrl.create(NotificationSettingsPage, item);
+
+    modal.present();
     
     modal.onDidDismiss((data)=>{
       console.log(data);
@@ -182,90 +184,66 @@ export class BookmarksPage {
 
       //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
       
-      for (let day of this.days)
+      let dayDifference = 0;
+      
+      if(currentDay != 3)
       {
-        //If the current Day is Wednesday
-        if (currentDay === 3)
-        {
-          console.log('current day = '+currentDay+" day is "+day);
-
-          let firstNotificationTime = new Date();
-          let dayDifference = 0;
-
-          firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
-          //Will be notified at this time
-          firstNotificationTime.setHours(this.chosenHours);
-          firstNotificationTime.setMinutes(this.chosenMinutes);
-
-          console.log('firstNotificationTime',firstNotificationTime)
-          let notification = {
-            id: day.dayCode + Math.floor(Math.random()*101),
-            title: 'Hey!',
-            text: 'New issues for '+item.series+'! :)',
-            at: firstNotificationTime,
-            every: 'week',
-            data: item
-          };
-
-        this.notifications.push(notification);
-        break;
-        }
-        else
-        {
-          console.log('ELSE BLOCK')
-          if(currentDay === day.dayCode)
-          {
-            let firstNotificationTime = new Date();
-            //let dayDifference = day.dayCode - currentDay; //Find difference in days since Wednesday
-            let dayDifference = 3 - currentDay;
-            console.log("dayDifference", dayDifference);
-
-            if(dayDifference < 0)
-            {
-              dayDifference = dayDifference + 7; //for cases where the day is in the following week
-            }  
-            firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
-            //Will be notified at this time
-            firstNotificationTime.setHours(this.chosenHours);
-            firstNotificationTime.setMinutes(this.chosenMinutes);
-
-            console.log('firstNotificationTime',firstNotificationTime)
-            let notification = {
-              id: day.dayCode + Math.floor(Math.random()*101),
-              title: 'Hey!',
-              text: 'New issues for '+item.series+'! :)',
-              at: firstNotificationTime,
-              every: 'week',
-              data: item
-            };
-
-          this.notifications.push(notification);
-          break;
-          }
-        }
+        dayDifference = 3 - currentDay;
       }
+
+      if (dayDifference < 0)
+      {
+        dayDifference = dayDifference + 7;
+      }
+
+      let firstNotificationTime = new Date();
+
+      firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
+      //Will be notified at this time
+      firstNotificationTime.setHours(this.chosenHours);
+      firstNotificationTime.setMinutes(this.chosenMinutes);
+
+      console.log('firstNotificationTime',firstNotificationTime)
+      let notification = {
+        id: Math.floor(Math.random()*101),
+        title: 'Hey!',
+        text: 'New issues for '+item.series+'! :)',
+        at: firstNotificationTime,
+        every: 'week',
+        data: item
+      };
+
+      this.notifications.push(notification);
+
       console.log("Notifications to be scheduled: ", this.notifications);
 
       this.storage.set('notifications',this.notifications);
-      
-      if(this.platform.is('cordova')){        
-        // Cancel any existing notifications
-        this.localNotifications.cancelAll().then(() => {
-          // Schedule the new notifications
-          this.localNotifications.schedule(this.notifications);
-          //this.notifications = [];
-          let alert = this.alertCtrl.create({
-              title: 'Notification set for '+item.series,
-              buttons: ['OK']
-          });
-          alert.present();
-        });   
-      }
+
+      //Schedule the new notifications
+      //this.localNotifications.schedule(this.notifications);
+      this.localNotifications.schedule(notification);
+      //this.notifications = [];
+
+      let alert = this.alertCtrl.create({
+        title: 'Notification set for '+item.series,
+        buttons: ['OK']
+      });
+      alert.present();
     });
     
-    modal.present();
+    //modal.present();
 }
+/*
+Notifications() {
+  this.localNotifications.getAll().then(notifs=>{
+    console.log('called Notifications() notifs',notifs)
 
+    for (var i = 0; i < notifs.length; i++) {
+      console.log("Text: "+notifs[i].text+" at: "+notifs[i].at);
+      console.log('Date conversion - *1000 and feed into new Date()', new Date(notifs[i].at*1000));
+    }
+  })
+}*/
 cancelNotifications(item){
   for (var i = 0; i<this.notifications.length; i++){
     let arrayItem = this.notifications[i];
