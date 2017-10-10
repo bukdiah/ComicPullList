@@ -13,6 +13,7 @@ import {ImagePage} from '../pages/image/image';
 import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 import {NotificationSettingsPage} from '../pages/notification-settings/notification-settings';
 import {ViewNotificationsPage} from '../pages/view-notifications/view-notifications';
+import {MapPage} from '../pages/map/map';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -21,6 +22,7 @@ import { ComicProvider } from '../providers/comic/comic';
 import{HttpModule} from '@angular/http';
 
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import {Geolocation} from '@ionic-native/geolocation';
 
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -36,7 +38,8 @@ import { IonicStorageModule } from '@ionic/storage';
     ImagePage,
     BookmarksPage,
     NotificationSettingsPage,
-    ViewNotificationsPage
+    ViewNotificationsPage,
+    MapPage
   ],
   imports: [
     BrowserModule,
@@ -56,14 +59,16 @@ import { IonicStorageModule } from '@ionic/storage';
     ImagePage,
     BookmarksPage,
     NotificationSettingsPage,
-    ViewNotificationsPage
+    ViewNotificationsPage,
+    MapPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
     LocalNotifications,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    ComicProvider
+    ComicProvider,
+    Geolocation
   ]
 })
 export class AppModule {}

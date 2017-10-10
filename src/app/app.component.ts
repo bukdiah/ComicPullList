@@ -12,6 +12,7 @@ import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import {AllPage} from '../pages/all/all';
+import {MapPage} from '../pages/map/map';
 
 @Component({
   templateUrl: 'app.html'
@@ -41,7 +42,8 @@ export class MyApp {
       {title: 'Marvel', component: MarvelPage, icon: 'appname-marvel'},
       {title: 'Image', component: ImagePage, icon: 'appname-image'},
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'},
-      {title: 'My Bookmarks', component: BookmarksPage, icon: 'bookmarks'}
+      {title: 'My Bookmarks', component: BookmarksPage, icon: 'bookmarks'},
+      {title: 'Locate Comic Shops', component: MapPage, icon: 'map'}
     ];
 
     this.activePage = this.pages[0];
