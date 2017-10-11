@@ -17,7 +17,6 @@ import * as moment from 'moment';
 export class BookmarksPage {
   bookmarks: Comic[];
   notifications: any[];
-  //days: any[];
   newIssues: Comic[];
   chosenHours: number;
   chosenMinutes: number;
@@ -29,16 +28,6 @@ export class BookmarksPage {
     this.bookmarks = [];
     this.newIssues = [];
     this.notifications = [];
-    /*
-    this.days = [
-      {title: 'Monday', dayCode: 1, checked: false},
-      {title: 'Tuesday', dayCode: 2, checked: false},
-      {title: 'Wednesday', dayCode: 3, checked: false},
-      {title: 'Thursday', dayCode: 4, checked: false},
-      {title: 'Friday', dayCode: 5, checked: false},
-      {title: 'Saturday', dayCode: 6, checked: false},
-      {title: 'Sunday', dayCode: 0, checked: false}
-    ];*/
 
     this.platform.ready().then(()=>{
       this.localNotifications.on("trigger", (notif,state)=>{
@@ -47,6 +36,8 @@ export class BookmarksPage {
         let comic = JSON.parse(notif.data);
         console.log('comic',comic);
         console.log('comic.series',comic.series);
+
+        let price = comic.price;
 
         let series = comic.series.trim();
 
@@ -70,7 +61,7 @@ export class BookmarksPage {
           let results = data.comics;
 
           results.forEach((arrayItem)=>{
-            if (arrayItem.title.includes(series) && arrayItem.creators === creators){
+            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
                 console.log('Found correct comic!', arrayItem);
 
                 let selector = "#"+seriesID.trim()+"_alert";
@@ -157,7 +148,7 @@ export class BookmarksPage {
 
     this.newIssues.forEach((arrayItem)=>{
       //if your bookmarked series matches a series in newIssues array
-      if (arrayItem.title.includes(item.series) && arrayItem.creators === item.creators) {
+      if (arrayItem.title.includes(item.series) && arrayItem.creators === item.creators && arrayItem.price === item.price) {
         this.navCtrl.push(ComicDetailsPage, {item: item});
       }
     });
@@ -231,19 +222,8 @@ export class BookmarksPage {
       alert.present();
     });
     
-    //modal.present();
 }
-/*
-Notifications() {
-  this.localNotifications.getAll().then(notifs=>{
-    console.log('called Notifications() notifs',notifs)
 
-    for (var i = 0; i < notifs.length; i++) {
-      console.log("Text: "+notifs[i].text+" at: "+notifs[i].at);
-      console.log('Date conversion - *1000 and feed into new Date()', new Date(notifs[i].at*1000));
-    }
-  })
-}*/
 cancelNotifications(item){
   for (var i = 0; i<this.notifications.length; i++){
     let arrayItem = this.notifications[i];
@@ -285,9 +265,7 @@ cancelNotifications(item){
   }
 
   viewNotifications(){
-    //this.navCtrl.push(ViewNotificationsPage,{item:this.notifications});
-        this.navCtrl.push(ViewNotificationsPage);
-
+    this.navCtrl.push(ViewNotificationsPage);
   }
 
 }
