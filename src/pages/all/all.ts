@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
 import {ComicProvider} from '../../providers/comic/comic';
 import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
-
 /**
  * Generated class for the AllPage page.
  *

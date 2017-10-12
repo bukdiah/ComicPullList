@@ -24,7 +24,11 @@
             </button>
             </ion-item>
             <ion-item-options>
-                <button #notify id="{{series.seriesID}}_notify" ion-button icon-start item-end (click)="addNotification($event, series)">
+                <!--<button #notify id="{{series.seriesID}}_notify" ion-button icon-start item-end (click)="addNotification($event, series)">
+                    <ion-icon name="notifications"></ion-icon>
+                    Notify
+                </button>-->
+                <button #notify id="{{series.seriesID}}_notify" ion-button icon-start item-end (click)="add($event, series)">
                     <ion-icon name="notifications"></ion-icon>
                     Notify
                 </button>
@@ -39,7 +43,7 @@
 <ion-footer no-shadow>
     <ion-toolbar position="bottom">
         <button ion-button full color="secondary" (click)="viewNotifications()">View Scheduled Notifications</button>
-        <!--<button ion-button full color="secondary" (click)="Notifications()">Notifications</button>  -->      
+        <!--<button ion-button full color="secondary" (click)="add()">Notifications</button>  -->
         <button ion-button full color="danger" (click)="cancelAll()">Cancel All Notifications</button>
     </ion-toolbar>
 </ion-footer>

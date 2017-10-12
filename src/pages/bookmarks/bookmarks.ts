@@ -8,6 +8,7 @@ import {NotificationSettingsPage} from '../../pages/notification-settings/notifi
 import {ViewNotificationsPage} from '../../pages/view-notifications/view-notifications';
 
 import * as moment from 'moment';
+import * as schedule from 'node-schedule';
 
 @IonicPage()
 @Component({
@@ -21,6 +22,8 @@ export class BookmarksPage {
   chosenHours: number;
   chosenMinutes: number;
 
+  job: any;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
   private localNotifications: LocalNotifications,
   private platform: Platform, public alertCtrl: AlertController, 
@@ -29,6 +32,22 @@ export class BookmarksPage {
     this.newIssues = [];
     this.notifications = [];
 
+    this.platform.ready().then(()=>{
+      this.localNotifications.on("trigger", (notif, state)=>{
+        console.log('notif.data',notif.data);
+
+        let comic = JSON.parse(notif.data);
+        let seriesID = comic.seriesID;
+
+        let selector = "#"+seriesID.trim()+"_alert";
+        console.log('selector',selector);
+
+        this.newIssues.push(comic); //add new issue to array
+        console.log('newIssues notify',this.newIssues);            
+        this.elementRef.nativeElement.querySelector(selector).disabled = false;
+      });
+    });
+    /*
     this.platform.ready().then(()=>{
       this.localNotifications.on("trigger", (notif,state)=>{
         
@@ -72,7 +91,8 @@ export class BookmarksPage {
                 console.log('nowDate',nowDate);
       
                 //New Issues Found
-                if(nowDate === comic.release_date) {
+                //Used to be nowDate === comic.release_date
+                if(nowDate === arrayItem.release_date) {
                   this.newIssues.push(arrayItem); //add new issue to array
                   console.log('newIssues notify',this.newIssues);            
                   this.elementRef.nativeElement.querySelector(selector).disabled = false;
@@ -86,17 +106,17 @@ export class BookmarksPage {
           });
         });
       });
-    }); 
+    }); */
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad BookmarksPage');
 
     this.storage.get('bookmarks').then((data)=>{
-      if (data != null)
-        {
-          this.bookmarks = data;
-        }
+      if (data != null){
+        this.bookmarks = data;
+        console.log('BOOKMARKS',this.bookmarks);
+      }
     });
 
     this.storage.get('notifications').then((data)=>{
@@ -152,6 +172,165 @@ export class BookmarksPage {
         this.navCtrl.push(ComicDetailsPage, {item: item});
       }
     });
+  }
+
+  add(event,item){
+    console.log('add() called');
+    console.log('item = ',item);
+
+    //Create modal to retrieve user inputed time!
+    
+    let modal = this.modalCtrl.create(NotificationSettingsPage,item);
+
+    modal.present();
+
+    modal.onDidDismiss((data)=>{
+      console.log('Time Data',data);
+
+      this.chosenHours = data.chosenHours;
+      this.chosenMinutes = data.chosenMinutes;
+
+      //WEDNESDAY = 3
+      let rule = new schedule.RecurrenceRule();
+      rule.hour = this.chosenHours;
+      rule.minute = this.chosenMinutes;
+      rule.dayOfWeek = 4;
+
+      this.job = schedule.scheduleJob(rule, ()=>{
+        let series = item.series.trim();
+        let creators = item.creators;
+        let price = item.price;
+        let seriesID = item.seriesID.trim();
+        let creators_array = creators.split(" ");
+        console.log('creators_array', creators_array);
+
+        this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
+          console.log('data getSeries',data);
+
+          let results = data.comics;
+
+          for (var arrayItem of results){
+            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
+              console.log('Found correct comic!', arrayItem);
+
+              //let selector = "#"+seriesID.trim()+"_alert";
+              //console.log('selector',selector);
+    
+              let nowDate = moment(new Date()).format("YYYY-MM-DD");
+    
+              console.log('nowDate',nowDate);
+
+              //New Issues Found
+              //Used to be nowDate === comic.release_date
+              if(nowDate === arrayItem.release_date) {
+                arrayItem.seriesID = seriesID;
+
+                let notification = {
+                  id: Math.floor(Math.random()*101),
+                  title: 'Hey!',
+                  text: 'New issues for '+item.series+'! :)',
+                  data: arrayItem
+                };
+          
+                this.notifications.push(notification);
+          
+                console.log("Notifications to be scheduled: ", this.notifications);
+          
+                this.storage.set('notifications',this.notifications);
+          
+                //Schedule the new notification
+                this.localNotifications.schedule(notification);
+              } 
+              else
+              {
+                console.log('No new issues found for '+series);
+                arrayItem.seriesID = seriesID;
+
+                let notification = {
+                  id: Math.floor(Math.random()*101),
+                  title: 'Hey!',
+                  text: 'New issues for '+item.series+'! :)',
+                  data: arrayItem
+                };
+          
+                this.notifications.push(notification);
+          
+                console.log("Notifications to be scheduled: ", this.notifications);
+          
+                this.storage.set('notifications',this.notifications);
+          
+                //Schedule the new notification
+                this.localNotifications.schedule(notification);
+              }
+              break;
+            }            
+          }
+
+         /* results.forEach((arrayItem)=>{
+            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
+                console.log('Found correct comic!', arrayItem);
+
+                //let selector = "#"+seriesID.trim()+"_alert";
+                //console.log('selector',selector);
+      
+                let nowDate = moment(new Date()).format("YYYY-MM-DD");
+      
+                console.log('nowDate',nowDate);
+
+                //New Issues Found
+                //Used to be nowDate === comic.release_date
+                if(nowDate === arrayItem.release_date) {
+                  arrayItem.seriesID = seriesID;
+
+                  let notification = {
+                    id: Math.floor(Math.random()*101),
+                    title: 'Hey!',
+                    text: 'New issues for '+item.series+'! :)',
+                    data: arrayItem
+                  };
+            
+                  this.notifications.push(notification);
+            
+                  console.log("Notifications to be scheduled: ", this.notifications);
+            
+                  this.storage.set('notifications',this.notifications);
+            
+                  //Schedule the new notification
+                  this.localNotifications.schedule(notification);
+                } 
+                else
+                {
+                  console.log('No new issues found for '+series);
+                  arrayItem.seriesID = seriesID;
+
+                  let notification = {
+                    id: Math.floor(Math.random()*101),
+                    title: 'Hey!',
+                    text: 'New issues for '+item.series+'! :)',
+                    data: arrayItem
+                  };
+            
+                  this.notifications.push(notification);
+            
+                  console.log("Notifications to be scheduled: ", this.notifications);
+            
+                  this.storage.set('notifications',this.notifications);
+            
+                  //Schedule the new notification
+                  this.localNotifications.schedule(notification);
+                }
+            }
+          });*/
+        });
+      });
+      let alert = this.alertCtrl.create({
+        title: 'Notification set for '+item.series,
+        buttons: ['OK']
+      });
+      alert.present();
+    });
+
+
   }
 
   addNotification(event, item) {
@@ -251,6 +430,7 @@ cancelNotifications(item){
 
   cancelAll()
   {
+    this.job.cancel();
     this.localNotifications.cancelAll();
     this.notifications = [];
 
