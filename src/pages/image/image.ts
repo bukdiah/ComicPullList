@@ -13,7 +13,7 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 @IonicPage()
 @Component({
   selector: 'page-image',
-  templateUrl: 'image.html',
+  templateUrl: 'image_card_list.html',
 })
 export class ImagePage {
   items : Comic[];

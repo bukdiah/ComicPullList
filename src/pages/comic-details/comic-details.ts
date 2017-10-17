@@ -13,7 +13,7 @@ import { Storage } from '@ionic/storage';
 @IonicPage()
 @Component({
   selector: 'page-comic-details',
-  templateUrl: 'comic-details.html',
+  templateUrl: 'comic_details_card.html',
 })
 export class ComicDetailsPage {
   selectedItem: any;

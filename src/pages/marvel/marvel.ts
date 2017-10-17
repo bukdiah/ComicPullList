@@ -13,7 +13,7 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 @IonicPage()
 @Component({
   selector: 'page-marvel',
-  templateUrl: 'marvel.html',
+  templateUrl: 'marvel_card_list.html',
 })
 export class MarvelPage {
 

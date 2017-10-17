@@ -12,7 +12,7 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 @IonicPage()
 @Component({
   selector: 'page-dc',
-  templateUrl: 'dc.html',
+  templateUrl: 'dc_card_list.html',
 })
 export class DcPage {
 
