@@ -126,7 +126,7 @@ export class ComicDetailsPage {
     if (poundIndex !== -1)
     {
       let seriesTitle: string = item.title.slice(0,poundIndex);
-      item.series = seriesTitle;
+      item.series = seriesTitle.trim();
       //item.seriesID = seriesTitle.replace(" ","").replace("&","").trim();
       item.seriesID = seriesTitle.replace(/ /g, "").replace("&","").trim();
       //this.bookmarks.push(seriesTitle);

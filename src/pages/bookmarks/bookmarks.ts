@@ -1,5 +1,5 @@
-import { Component, ElementRef} from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController,ModalController } from 'ionic-angular';
+import { Component, ElementRef, NgZone} from '@angular/core';
+import { IonicPage, NavController, NavParams, Platform, AlertController,ModalController, Content } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import {ComicProvider} from '../../providers/comic/comic';
@@ -16,36 +16,77 @@ import * as schedule from 'node-schedule';
   templateUrl: 'bookmarks.html',
 })
 export class BookmarksPage {
+
   bookmarks: Comic[];
   notifications: any[];
   newIssues: Comic[];
   chosenHours: number;
   chosenMinutes: number;
+  toggleSeries: Comic;
 
-  job: any;
+  jobs: any[];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
+  constructor(public zone: NgZone,public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
   private localNotifications: LocalNotifications,
   private platform: Platform, public alertCtrl: AlertController, 
   private comicProvider: ComicProvider, private elementRef: ElementRef, public modalCtrl: ModalController) {
     this.bookmarks = [];
     this.newIssues = [];
     this.notifications = [];
+    this.jobs = [];
+    this.toggleSeries = null;
+    this.zone = new NgZone({enableLongStackTrace: false});
 
     this.platform.ready().then(()=>{
+      
       this.localNotifications.on("trigger", (notif, state)=>{
         console.log('notif.data',notif.data);
 
         let comic = JSON.parse(notif.data);
-        let seriesID = comic.seriesID;
+        //let seriesID = comic.seriesID;
 
-        let selector = "#"+seriesID.trim()+"_alert";
-        console.log('selector',selector);
+        //let selector = "#"+seriesID.trim()+"_alert";
+        //console.log('selector',selector);
 
         this.newIssues.push(comic); //add new issue to array
-        console.log('newIssues notify',this.newIssues);            
-        this.elementRef.nativeElement.querySelector(selector).disabled = false;
+        console.log('newIssues notify',this.newIssues);
+        
+        this.newIssues.forEach((arrayItem)=>{
+          //if your bookmarked series matches a series in newIssues array
+          if(arrayItem.title.includes(comic.series) && arrayItem.creators === comic.creators && arrayItem.price === comic.price) {
+            this.zone.run(()=>{
+              this.toggleSeries = arrayItem;
+            })
+            //this.toggleSeries = arrayItem;
+            console.log('toggleSeries variable = ',this.toggleSeries);
+          }          
+        });
+        //this.enableAlert(selector);
+        //this.elementRef.nativeElement.querySelector(selector).disabled = false;
       });
+
+      /*
+      this.localNotifications.on("click", (notif, state)=>{
+        console.log('notif.data',notif.data);
+        console.log('POOP')
+        let comic = JSON.parse(notif.data);
+        let seriesID = comic.seriesID;
+        var poundIndex = comic.title.indexOf('#');
+        comic.series = comic.title.slice(0,poundIndex);
+
+        //let selector = "#"+seriesID.trim()+"_alert";
+        //console.log('selector',selector);
+        //this.enableAlert(selector);
+        //this.newIssues.push(comic); //add new issue to array
+        console.log('newIssues notify',this.newIssues);            
+        //this.itemSelected2(comic);
+        this.newIssues.forEach((arrayItem)=>{
+          //if your bookmarked series matches a series in newIssues array
+          if (arrayItem.title.includes(comic.series) && arrayItem.creators === comic.creators && arrayItem.price === comic.price) {
+            this.navCtrl.push(ComicDetailsPage, {item: comic});
+          }
+        });
+      });*/
     });
     /*
     this.platform.ready().then(()=>{
@@ -109,8 +150,15 @@ export class BookmarksPage {
     }); */
   }
 
+  enableAlert(selector)
+  {
+    console.log('enableAlert called');
+    this.elementRef.nativeElement.querySelector(selector).disabled = false;
+  }
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad BookmarksPage');
+    console.log('ALERT',this.elementRef.nativeElement.querySelector('#ACTIONCOMICS_ALERT'));
 
     this.storage.get('bookmarks').then((data)=>{
       if (data != null){
@@ -194,9 +242,9 @@ export class BookmarksPage {
       let rule = new schedule.RecurrenceRule();
       rule.hour = this.chosenHours;
       rule.minute = this.chosenMinutes;
-      rule.dayOfWeek = 4;
+      rule.dayOfWeek = 6;
 
-      this.job = schedule.scheduleJob(rule, ()=>{
+      let job = schedule.scheduleJob(rule, ()=>{
         let series = item.series.trim();
         let creators = item.creators;
         let price = item.price;
@@ -224,6 +272,7 @@ export class BookmarksPage {
               //Used to be nowDate === comic.release_date
               if(nowDate === arrayItem.release_date) {
                 arrayItem.seriesID = seriesID;
+                arrayItem.series = series;
 
                 let notification = {
                   id: Math.floor(Math.random()*101),
@@ -233,7 +282,7 @@ export class BookmarksPage {
                 };
           
                 this.notifications.push(notification);
-          
+                //this.newIssues.push(arrayItem); //add new issue to array
                 console.log("Notifications to be scheduled: ", this.notifications);
           
                 this.storage.set('notifications',this.notifications);
@@ -243,9 +292,10 @@ export class BookmarksPage {
               } 
               else
               {
-                console.log('No new issues found for '+series);
+                console.log('No new issues found for '+series); //Testing Only
                 arrayItem.seriesID = seriesID;
-
+                arrayItem.series = series;
+                
                 let notification = {
                   id: Math.floor(Math.random()*101),
                   title: 'Hey!',
@@ -254,7 +304,7 @@ export class BookmarksPage {
                 };
           
                 this.notifications.push(notification);
-          
+                //this.newIssues.push(arrayItem); //add new issue to array
                 console.log("Notifications to be scheduled: ", this.notifications);
           
                 this.storage.set('notifications',this.notifications);
@@ -265,64 +315,16 @@ export class BookmarksPage {
               break;
             }            
           }
-
-         /* results.forEach((arrayItem)=>{
-            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
-                console.log('Found correct comic!', arrayItem);
-
-                //let selector = "#"+seriesID.trim()+"_alert";
-                //console.log('selector',selector);
-      
-                let nowDate = moment(new Date()).format("YYYY-MM-DD");
-      
-                console.log('nowDate',nowDate);
-
-                //New Issues Found
-                //Used to be nowDate === comic.release_date
-                if(nowDate === arrayItem.release_date) {
-                  arrayItem.seriesID = seriesID;
-
-                  let notification = {
-                    id: Math.floor(Math.random()*101),
-                    title: 'Hey!',
-                    text: 'New issues for '+item.series+'! :)',
-                    data: arrayItem
-                  };
-            
-                  this.notifications.push(notification);
-            
-                  console.log("Notifications to be scheduled: ", this.notifications);
-            
-                  this.storage.set('notifications',this.notifications);
-            
-                  //Schedule the new notification
-                  this.localNotifications.schedule(notification);
-                } 
-                else
-                {
-                  console.log('No new issues found for '+series);
-                  arrayItem.seriesID = seriesID;
-
-                  let notification = {
-                    id: Math.floor(Math.random()*101),
-                    title: 'Hey!',
-                    text: 'New issues for '+item.series+'! :)',
-                    data: arrayItem
-                  };
-            
-                  this.notifications.push(notification);
-            
-                  console.log("Notifications to be scheduled: ", this.notifications);
-            
-                  this.storage.set('notifications',this.notifications);
-            
-                  //Schedule the new notification
-                  this.localNotifications.schedule(notification);
-                }
-            }
-          });*/
+        },
+        (e)=>{console.log('onError: %s', e)},
+        ()=>{
+          console.log('On Complete');
+          console.log('job = ',job);
+          this.jobs.push(job);
         });
       });
+      //this.jobs.push(job);
+
       let alert = this.alertCtrl.create({
         title: 'Notification set for '+item.series,
         buttons: ['OK']
@@ -430,9 +432,18 @@ cancelNotifications(item){
 
   cancelAll()
   {
-    this.job.cancel();
+    //this.job.cancel();
+    this.jobs.forEach((job)=>{
+      job.cancel();
+    });
+
+    this.jobs = [];
+
+    console.log('Jobs', this.jobs);
+    
     this.localNotifications.cancelAll();
     this.notifications = [];
+    this.newIssues = [];
 
     this.storage.set('notifications',this.notifications);
 
