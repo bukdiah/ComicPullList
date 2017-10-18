@@ -82,7 +82,10 @@ export class ComicDetailsPage {
 
         for (var title of this.bookmarks)
         {
-          if (title.series === this.selectedItem.title.slice(0,poundIndex))
+          console.log('Tile in bookmarks',title);
+          console.log('selected Item Title',this.selectedItem.title.slice(0,poundIndex).trim())
+          
+          if (title.series === this.selectedItem.title.slice(0,poundIndex).trim())
           {
             console.log("SERIES ALREADY BOOKMARKED", title);
             this.selectedItem.bookmarked = true;
@@ -108,6 +111,7 @@ export class ComicDetailsPage {
 
    // this.added = this.selectedItem.added;
     this.added = true;
+    this.selectedItem.disabled = true;
     this.list.push(this.selectedItem);
     
     //this.storage.set('pull-list', JSON.stringify(this.selectedItem));
@@ -115,7 +119,7 @@ export class ComicDetailsPage {
   }
 
   bookmark(item) {
-    console.log("CLICK");
+    console.log("CLICKED BOOKMARK");
 
     let booked: boolean = true;
     this.isSeries = !booked;
@@ -127,12 +131,15 @@ export class ComicDetailsPage {
     {
       let seriesTitle: string = item.title.slice(0,poundIndex);
       item.series = seriesTitle.trim();
+      item.disabled = true;
       //item.seriesID = seriesTitle.replace(" ","").replace("&","").trim();
       item.seriesID = seriesTitle.replace(/ /g, "").replace("&","").trim();
       //this.bookmarks.push(seriesTitle);
       this.bookmarks.push(item);
       //save to Storage
       this.storage.set('bookmarks', this.bookmarks);
+
+      console.log('Bookmarks Array Saved: ',this.bookmarks);
     }
     //this.isSeries = true;
     /*
@@ -159,5 +166,6 @@ interface Comic {
   added?: boolean,
   bookmarked?: boolean,
   series?: string,
-  seriesID?:string
+  seriesID?:string,
+  disabled?: boolean
 }

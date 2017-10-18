@@ -18,9 +18,10 @@
                 </button>
             </ion-item-options>
             <ion-item>
-                <h2 text-left>{{series.series}}</h2>
+                <h3 text-left>{{series.series}}</h3>
                 <!--<button id="{{series.seriesID}}_alert" disabled="true" icon-start ion-button clear item-end color="secondary" (click)="itemSelected($event, series)">-->
-                <button *ngIf="toggleSeries != null" id="{{series.seriesID}}_alert" [disabled]="!series.series===toggleSeries.series" icon-start ion-button clear item-end color="secondary" (click)="itemSelected($event, series)">   
+                <!--<button *ngIf="toggleSeries != null" id="{{series.seriesID}}_alert" [disabled]="!series.seriesID===toggleSeries.seriesID" icon-start ion-button clear item-end color="secondary" (click)="itemSelected($event, series)">  -->           
+                <button id="{{series.seriesID}}_alert" [disabled]="series.disabled" icon-start ion-button clear item-end color="secondary" (click)="itemSelected($event, series)">   
                 <ion-icon name="alert"></ion-icon>
             </button>
             </ion-item>
