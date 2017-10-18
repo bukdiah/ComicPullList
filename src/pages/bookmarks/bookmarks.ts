@@ -1,5 +1,5 @@
-import { Component, ElementRef, NgZone} from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController,ModalController, Content } from 'ionic-angular';
+import { Component, NgZone} from '@angular/core';
+import { IonicPage, NavController, NavParams, Platform, AlertController,ModalController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import {ComicProvider} from '../../providers/comic/comic';
@@ -22,20 +22,17 @@ export class BookmarksPage {
   newIssues: Comic[];
   chosenHours: number;
   chosenMinutes: number;
-  //toggleSeries: Comic;
-  //toggleSeries: String = "x";
+
   jobs: any[];
 
   constructor(public zone: NgZone,public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
   private localNotifications: LocalNotifications,
   private platform: Platform, public alertCtrl: AlertController, 
-  private comicProvider: ComicProvider, private elementRef: ElementRef, public modalCtrl: ModalController) {
+  private comicProvider: ComicProvider, public modalCtrl: ModalController) {
     this.bookmarks = [];
     this.newIssues = [];
     this.notifications = [];
     this.jobs = [];
-    //this.toggleSeries = null;
-    //this.toggleSeries="x";
 
     this.zone = new NgZone({enableLongStackTrace: false});
 
@@ -60,19 +57,6 @@ export class BookmarksPage {
             }
           }
         }
-
-        //OLD - DID not work
-        /*this.newIssues.forEach((arrayItem)=>{
-          //if your bookmarked series matches a series in newIssues array
-          if(arrayItem.title.includes(comic.series) && arrayItem.creators === comic.creators && arrayItem.price === comic.price) {
-            this.zone.run(()=>{
-              //this.toggleSeries = arrayItem;
-              //this.toggleSeries = arrayItem.seriesID;
-            })
-            //this.toggleSeries = arrayItem;
-            //console.log('toggleSeries variable = ',this.toggleSeries);
-          }          
-        });*/
       });
     });
   }
@@ -124,11 +108,29 @@ export class BookmarksPage {
           this.notifications.splice(j,1);
         }
       }
+
+      for (var i=0; i<this.jobs.length; i++){
+        let job = this.jobs[i];
+        console.log('job.ID = ',job.ID)
+    
+        if(job.series === item.series){
+          job.cancel();
+          this.jobs.splice(i,1);
+        }
+      }
+
+      //this.cancelNotifications(item);
       console.log("Notifications remaining: ", this.notifications);
 
       this.storage.set('notifications',this.notifications); //saving notifications to local storage
 
       this.storage.set('bookmarks', this.bookmarks);
+
+      let alert = this.alertCtrl.create({
+        title: 'Deleted '+item.series+' from bookmarks!',
+        buttons: ['OK']
+      });
+      alert.present();
   }
 
   itemSelected(event, item) {
@@ -146,24 +148,24 @@ export class BookmarksPage {
   add(event,item){
     console.log('add() called');
     console.log('item = ',item);
-
     //Create modal to retrieve user inputed time!
-    
+    let ID = Math.floor(Math.random()*101);
+
     let modal = this.modalCtrl.create(NotificationSettingsPage,item);
 
     modal.present();
 
     modal.onDidDismiss((data)=>{
       console.log('Time Data',data);
-
+      //let ID;
       this.chosenHours = data.chosenHours;
       this.chosenMinutes = data.chosenMinutes;
-
+      
       //WEDNESDAY = 3
       let rule = new schedule.RecurrenceRule();
       rule.hour = this.chosenHours;
       rule.minute = this.chosenMinutes;
-      rule.dayOfWeek = 2;
+      rule.dayOfWeek = 3;
 
       let job = schedule.scheduleJob(rule, ()=>{
         let series = item.series.trim();
@@ -173,6 +175,8 @@ export class BookmarksPage {
         let creators_array = creators.split(" ");
         console.log('creators_array', creators_array);
 
+        //ID = Math.floor(Math.random()*101);
+
         this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
           console.log('data getSeries',data);
 
@@ -181,9 +185,6 @@ export class BookmarksPage {
           for (var arrayItem of results){
             if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
               console.log('Found correct comic!', arrayItem);
-
-              //let selector = "#"+seriesID.trim()+"_alert";
-              //console.log('selector',selector);
     
               let nowDate = moment(new Date()).format("YYYY-MM-DD");
     
@@ -196,14 +197,14 @@ export class BookmarksPage {
                 arrayItem.series = series;
 
                 let notification = {
-                  id: Math.floor(Math.random()*101),
+                  //id: Math.floor(Math.random()*101),
+                  id: ID,
                   title: 'Hey!',
                   text: 'New issues for '+item.series+'! :)',
                   data: arrayItem
                 };
           
                 this.notifications.push(notification);
-                //this.newIssues.push(arrayItem); //add new issue to array
                 console.log("Notifications to be scheduled: ", this.notifications);
           
                 this.storage.set('notifications',this.notifications);
@@ -214,24 +215,6 @@ export class BookmarksPage {
               else
               {
                 console.log('No new issues found for '+series); //Testing Only
-                arrayItem.seriesID = seriesID;
-                arrayItem.series = series;
-                
-                let notification = {
-                  id: Math.floor(Math.random()*101),
-                  title: 'Hey!',
-                  text: 'New issues for '+item.series+'! :)',
-                  data: arrayItem
-                };
-          
-                this.notifications.push(notification);
-                //this.newIssues.push(arrayItem); //add new issue to array
-                console.log("Notifications to be scheduled: ", this.notifications);
-          
-                this.storage.set('notifications',this.notifications);
-          
-                //Schedule the new notification
-                this.localNotifications.schedule(notification);
               }
               break;
             }            
@@ -240,11 +223,20 @@ export class BookmarksPage {
         (e)=>{console.log('onError: %s', e)},
         ()=>{
           console.log('On Complete');
-          console.log('job = ',job);
+          //console.log('job = ',job);
+          /*
+          job.ID = ID;
+          console.log("Job = ",job);
           this.jobs.push(job);
+          console.log('On Complete Jobs',this.jobs);*/
         });
       });
-      //this.jobs.push(job);
+
+      job.ID = ID;
+      job.series = item.series;
+      console.log("Job = ",job);
+      this.jobs.push(job);
+      console.log('Jobs',this.jobs);
 
       let alert = this.alertCtrl.create({
         title: 'Notification set for '+item.series,
@@ -327,8 +319,10 @@ export class BookmarksPage {
 }
 
 cancelNotifications(item){
+  
   for (var i = 0; i<this.notifications.length; i++){
     let arrayItem = this.notifications[i];
+    //ID = arrayItem.id;
     //let comic = JSON.parse(arrayItem.data);
     let comic = arrayItem;
     console.log('looping thru notifications in cancelNotifications()',comic);
@@ -340,15 +334,27 @@ cancelNotifications(item){
       this.notifications.splice(i,1);
     }    
   }
-  //this.localNotifications.cancelAll();
+
+  for (var i=0; i<this.jobs.length; i++){
+    let job = this.jobs[i];
+    console.log('job.ID = ',job.ID)
+
+    if(job.series === item.series){
+      job.cancel();
+      this.jobs.splice(i,1);
+    }
+  }
+
   console.log("Notifications remaining: ", this.notifications);
+  console.log('Jobs remaining in array: ',this.jobs);
+
   this.storage.set('notifications',this.notifications);
 
-      let alert = this.alertCtrl.create({
-          title: 'Notification cancelled for '+item.series,
-          buttons: ['OK']
-      });
-      alert.present();
+  let alert = this.alertCtrl.create({
+      title: 'Notification cancelled for '+item.series,
+      buttons: ['OK']
+    });
+  alert.present();
   }
 
   cancelAll()
@@ -365,6 +371,8 @@ cancelNotifications(item){
     this.localNotifications.cancelAll();
     this.notifications = [];
     this.newIssues = [];
+
+    console.log('cancelAll() newIssues Array value ',this.newIssues);
 
     this.storage.set('notifications',this.notifications);
 

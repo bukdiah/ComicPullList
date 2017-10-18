@@ -16,10 +16,12 @@
 <ion-content>
     <ion-card>
         <ion-row>
-            <ion-col col-5>
-                <img float-left style="height: auto; width: 50vw; margin: auto; display: block" [src]="selectedItem.cover_url">
+            <ion-col col-6>
+                <!-- <img float-left style="height: auto; width: 50vw; margin: auto; display: block" [src]="selectedItem.cover_url"> -->
+                <img style="height: auto; margin: auto; display: block" [src]="selectedItem.cover_url">
+
             </ion-col>
-            <ion-col text-center col-7>
+            <ion-col text-center col-6>
                 <h1 *ngIf="selectedItem">
                     {{selectedItem.title}}
                 </h1>

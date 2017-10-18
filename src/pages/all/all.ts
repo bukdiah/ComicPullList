@@ -12,7 +12,7 @@ import {ComicDetailsPage} from '../../pages/comic-details/comic-details';
 @IonicPage()
 @Component({
   selector: 'page-all',
-  templateUrl: 'all.html',
+  templateUrl: 'all_card_details.html',
 })
 export class AllPage {
   items : Comic[];
