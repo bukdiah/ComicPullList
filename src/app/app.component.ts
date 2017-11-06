@@ -2,17 +2,18 @@ import { Component, ViewChild } from '@angular/core';
 
 import { Platform, MenuController, Nav } from 'ionic-angular';
 
-import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
+//import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
 import {DcPage} from '../pages/dc/dc';
-import {PullListPage} from '../pages/pull-list/pull-list';
+//import {PullListPage} from '../pages/pull-list/pull-list';
 import {MarvelPage} from '../pages/marvel/marvel';
 import {ImagePage} from '../pages/image/image';
-import {BookmarksPage} from '../pages/bookmarks/bookmarks';
+//import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import {AllPage} from '../pages/all/all';
-import {MapPage} from '../pages/map/map';
+//import {MapPage} from '../pages/map/map';
+import {TabsPage} from '../pages/tabs/tabs';
 
 @Component({
   templateUrl: 'app.html'
@@ -21,9 +22,10 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   // make HelloIonicPage the root (or first) page
-  rootPage = HelloIonicPage;
+  //rootPage = HelloIonicPage; //Originally this
   activePage : any;
-  //rootPage = AllPage;
+  
+  rootPage = TabsPage;
   pages: Array<{title: string, component: any, icon?: String}>;
 
   constructor(
@@ -34,7 +36,8 @@ export class MyApp {
   ) {
     this.initializeApp();
 
-    // set our app's pages
+    // set our app's pages ORIGINAL
+    /*
     this.pages = [
       { title: 'Home', component: HelloIonicPage, icon: 'home' },
       {title: 'All', component: AllPage, icon: 'book'},
@@ -44,6 +47,13 @@ export class MyApp {
       {title: 'My Pull List', component: PullListPage, icon: 'list-box'},
       {title: 'My Bookmarks', component: BookmarksPage, icon: 'bookmarks'},
       {title: 'Locate Comic Shops', component: MapPage, icon: 'map'}
+    ];*/
+    this.pages = [
+      { title: 'Home', component: TabsPage, icon: 'home' },
+      {title: 'All', component: AllPage, icon: 'book'},
+      {title: 'DC', component: DcPage, icon: 'appname-dc'},
+      {title: 'Marvel', component: MarvelPage, icon: 'appname-marvel'},
+      {title: 'Image', component: ImagePage, icon: 'appname-image'},
     ];
 
     this.activePage = this.pages[0];
@@ -55,6 +65,8 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      // set to portrait
+      //this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
     });
   }
 

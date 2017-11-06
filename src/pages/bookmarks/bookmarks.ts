@@ -63,8 +63,23 @@ export class BookmarksPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad BookmarksPage');
-    //this.toggleSeries="x";
-    
+
+    this.storage.get('bookmarks').then((data)=>{
+      if (data != null){
+        this.bookmarks = data;
+        console.log('BOOKMARKS',this.bookmarks);
+      }
+    });
+
+    this.storage.get('notifications').then((data)=>{
+      if (data != null) {
+        this.notifications = data;
+      }
+    });
+  }
+
+  ionViewDidEnter(){
+    console.log('ionViewDidEnter() BookmarksPage');
     this.storage.get('bookmarks').then((data)=>{
       if (data != null){
         this.bookmarks = data;
@@ -90,6 +105,7 @@ export class BookmarksPage {
         if(item === comic)
           {
             console.log('WHOOP THERE IT IS');
+            item.bookmarked = false;
             this.bookmarks.splice(i,1);
           }
       }
@@ -109,13 +125,13 @@ export class BookmarksPage {
         }
       }
 
-      for (var i=0; i<this.jobs.length; i++){
-        let job = this.jobs[i];
+      for (var k=0; k<this.jobs.length; k++){
+        let job = this.jobs[k];
         console.log('job.ID = ',job.ID)
     
         if(job.series === item.series){
           job.cancel();
-          this.jobs.splice(i,1);
+          this.jobs.splice(k,1);
         }
       }
 
@@ -223,12 +239,6 @@ export class BookmarksPage {
         (e)=>{console.log('onError: %s', e)},
         ()=>{
           console.log('On Complete');
-          //console.log('job = ',job);
-          /*
-          job.ID = ID;
-          console.log("Job = ",job);
-          this.jobs.push(job);
-          console.log('On Complete Jobs',this.jobs);*/
         });
       });
 
@@ -248,82 +258,9 @@ export class BookmarksPage {
 
   }
 
-  addNotification(event, item) {
-    
-    console.log('NOTIFIED');
-    console.log('item',item);
-
-    //Create modal to retrieve user inputed time!
-    let modal = this.modalCtrl.create(NotificationSettingsPage, item);
-
-    modal.present();
-    
-    modal.onDidDismiss((data)=>{
-      console.log(data);
-
-      this.chosenHours = data.chosenHours;
-      this.chosenMinutes = data.chosenMinutes;
-
-      let currentDate = new Date();
-      let currentDay = currentDate.getDay(); //Sunday = 0, Monday =1, etc.
-
-      //We gotta notify the user every WEDNESDAY = 3 if their series gets a new issue
-      
-      let dayDifference = 0;
-      
-      if(currentDay != 3)
-      {
-        dayDifference = 3 - currentDay;
-      }
-
-      if (dayDifference < 0)
-      {
-        dayDifference = dayDifference + 7;
-      }
-
-      let firstNotificationTime = new Date();
-
-      firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));            
-      //Will be notified at this time
-      firstNotificationTime.setHours(this.chosenHours);
-      firstNotificationTime.setMinutes(this.chosenMinutes);
-
-      console.log('firstNotificationTime',firstNotificationTime)
-      let notification = {
-        id: Math.floor(Math.random()*101),
-        title: 'Hey!',
-        text: 'New issues for '+item.series+'! :)',
-        at: firstNotificationTime,
-        every: 'week',
-        data: item
-      };
-
-      this.notifications.push(notification);
-
-      console.log("Notifications to be scheduled: ", this.notifications);
-
-      this.storage.set('notifications',this.notifications);
-
-      //Schedule the new notifications
-      //this.localNotifications.schedule(this.notifications);
-      this.localNotifications.schedule(notification);
-      //this.notifications = [];
-
-      let alert = this.alertCtrl.create({
-        title: 'Notification set for '+item.series,
-        buttons: ['OK']
-      });
-      alert.present();
-    });
-    
-}
-
-cancelNotifications(item){
-  
+cancelNotification(item){
   for (var i = 0; i<this.notifications.length; i++){
     let arrayItem = this.notifications[i];
-    //ID = arrayItem.id;
-    //let comic = JSON.parse(arrayItem.data);
     let comic = arrayItem;
     console.log('looping thru notifications in cancelNotifications()',comic);
     
@@ -335,13 +272,13 @@ cancelNotifications(item){
     }    
   }
 
-  for (var i=0; i<this.jobs.length; i++){
-    let job = this.jobs[i];
+  for (var k=0; k<this.jobs.length; k++){
+    let job = this.jobs[k];
     console.log('job.ID = ',job.ID)
 
     if(job.series === item.series){
       job.cancel();
-      this.jobs.splice(i,1);
+      this.jobs.splice(k,1);
     }
   }
 
@@ -359,7 +296,6 @@ cancelNotifications(item){
 
   cancelAll()
   {
-    //this.job.cancel();
     this.jobs.forEach((job)=>{
       job.cancel();
     });

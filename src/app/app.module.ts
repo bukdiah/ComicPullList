@@ -14,6 +14,7 @@ import {BookmarksPage} from '../pages/bookmarks/bookmarks';
 import {NotificationSettingsPage} from '../pages/notification-settings/notification-settings';
 import {ViewNotificationsPage} from '../pages/view-notifications/view-notifications';
 import {MapPage} from '../pages/map/map';
+import {TabsPage} from '../pages/tabs/tabs';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -25,6 +26,8 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 import {Geolocation} from '@ionic-native/geolocation';
 
 import { IonicStorageModule } from '@ionic/storage';
+
+import {ScreenOrientation} from '@ionic-native/screen-orientation';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,8 @@ import { IonicStorageModule } from '@ionic/storage';
     BookmarksPage,
     NotificationSettingsPage,
     ViewNotificationsPage,
-    MapPage
+    MapPage,
+    TabsPage
   ],
   imports: [
     BrowserModule,
@@ -60,7 +64,8 @@ import { IonicStorageModule } from '@ionic/storage';
     BookmarksPage,
     NotificationSettingsPage,
     ViewNotificationsPage,
-    MapPage
+    MapPage,
+    TabsPage
   ],
   providers: [
     StatusBar,
@@ -68,7 +73,8 @@ import { IonicStorageModule } from '@ionic/storage';
     LocalNotifications,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ComicProvider,
-    Geolocation
+    Geolocation,
+    ScreenOrientation
   ]
 })
 export class AppModule {}

@@ -34,8 +34,7 @@ export class MapPage {
       let location = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
 
       this.showMap(location);
-      this.addMarker();
-
+      
       this.findComicStores(location);
 
      }).catch((error) => {

@@ -13,15 +13,58 @@
     </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="home">
+    <!--
+    <ion-grid>
+        <ion-row style="background-color: #e74c3c; flex: 1">
+            <ion-card>
+                <ion-row>
+                    <ion-col col-5>
+                        <img style="height: auto; width: auto; margin: auto; display: block" [src]="selectedItem.cover_url">
+                    </ion-col>
+                    <ion-col text-center col-7>
+                        <h1 *ngIf="selectedItem">
+                            {{selectedItem.title}}
+                        </h1>
+                        <p *ngIf="selectedItem">
+                            By: {{selectedItem.creators}}
+                        </p>
+                        <p *ngIf="selectedItem">
+                            Pub. Date: {{selectedItem.release_date}}
+                        </p>
+                    </ion-col>
+                </ion-row>
+            </ion-card>
+        </ion-row>
+
+        <ion-row style="background-color: #f1c40f; flex: 1">
+            <ion-col id="description">
+                <p text-left *ngIf="selectedItem">
+                    {{selectedItem.description}}
+                </p>
+            </ion-col>
+        </ion-row>
+        <div style="display: flex;">
+            <ion-row style="background-color: #9b59b6; flex: 1;">
+                <button col-12 col-sm [disabled]="added" ion-button icon-start (click)="addToPullList()">
+                    <ion-icon name='add'></ion-icon>
+                        Add to Pull List
+                </button>
+
+                <button col-12 col-sm [disabled]="!isSeries" ion-button icon-start (click)="bookmark(selectedItem)">
+                    <ion-icon name='bookmark'></ion-icon>
+                        Bookmark Series
+                </button>
+            </ion-row>
+        </div>
+    </ion-grid> -->
+
     <ion-card>
         <ion-row>
-            <ion-col col-6>
-                <!-- <img float-left style="height: auto; width: 50vw; margin: auto; display: block" [src]="selectedItem.cover_url"> -->
-                <img style="height: auto; margin: auto; display: block" [src]="selectedItem.cover_url">
-
+            <ion-col col-5>
+                <img style="height: auto; margin: 0px; display: block" [src]="selectedItem.cover_url">
             </ion-col>
-            <ion-col text-center col-6>
+            <ion-col text-center col-7>
                 <h1 *ngIf="selectedItem">
                     {{selectedItem.title}}
                 </h1>
@@ -34,10 +77,11 @@
             </ion-col>
         </ion-row>
     </ion-card>
-    <p text-center *ngIf="selectedItem">
+    <p *ngIf="selectedItem" padding>
         {{selectedItem.description}}
     </p>
-    <div text-center>
+    <!--
+    <div text-center class="button-bottom">
         <button [disabled]="added" ion-button icon-start (click)="addToPullList()">
             <ion-icon name='add'></ion-icon>
             Add to Pull List
@@ -47,5 +91,18 @@
             <ion-icon name='bookmark'></ion-icon>
             Bookmark Series
         </button>
-    </div>
+    </div> -->
 </ion-content>
+<ion-footer>
+    <div text-center>
+        <button [disabled]="added" ion-button icon-start (click)="addToPullList()">
+                    <ion-icon name='add'></ion-icon>
+                    Add to Pull List
+                </button>
+
+        <button [disabled]="!isSeries" ion-button icon-start (click)="bookmark(selectedItem)">
+                    <ion-icon name='bookmark'></ion-icon>
+                    Bookmark Series
+                </button>
+    </div>
+</ion-footer>
