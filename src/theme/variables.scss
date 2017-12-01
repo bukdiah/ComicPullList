@@ -26,8 +26,7 @@ $colors: ( primary: #1e67e1, secondary: #1ee19a, danger: #f53d3d, light: #f4f4f4
 $toolbar-md-background: color($colors, primary);
 // App iOS Variables
 // --------------------------------------------------
-// iOS only Sass variables can go here
-// App Material Design Variables
+$toolbar-ios-background: color($colors, primary);
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 // App Windows Variables

@@ -118,7 +118,7 @@ export class ComicDetailsPage {
 
   
   ionViewDidEnter(){
-    console.log('ionViewDidEnter loaded')
+    console.log('ionViewDidEnter loaded of Comic-Details')
     //Create the loading popup
     let loadingPopup = this.loadingCtrl.create({
       content: 'Loading Comic...'
@@ -162,11 +162,11 @@ export class ComicDetailsPage {
       else{
         console.log('Else Block of didEnter')
         this.bookmarks = [];
-        /*
+        
         this.ngZone.run(()=>{
           this.selectedItem.bookmarked = false;
           this.isSeries = !this.selectedItem.bookmarked;
-        })*/
+        })
       }
     });
 
