@@ -18,8 +18,8 @@ export class DcPage {
 
   //items: Array<{publisher: string,title: string, price: string, desc: string, creators: string, release_date: string, diamond_id: string}>;
   items : Comic[];
-  //cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/200/';
-  cover_url ="http://cdn.nexternal.com/dreamland/images/"; //can find most covers using diamond id
+  cover_small_url='http://d2lzb5v10mb0lj.cloudfront.net/covers_tfaw/300/';
+  //cover_url ="http://cdn.nexternal.com/dreamland/images/"; //can find most covers using diamond id
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
   private comicProvider: ComicProvider, private loadingCtrl: LoadingController) {
@@ -44,11 +44,11 @@ export class DcPage {
     err=>console.log(err),
     ()=>{
       for (var comic of this.items) {
-        //let d_id_slice = comic.diamond_id.slice(0,2);
+        let d_id_slice = comic.diamond_id.slice(0,2);
         //console.log(d_id_slice);
-        //comic.cover_url = this.cover_small_url+d_id_slice+"/"+comic.diamond_id+".jpg";
+        comic.cover_url = this.cover_small_url+d_id_slice+"/"+comic.diamond_id+".jpg";
         //console.log('Cover URL',comic.cover_url);
-        comic.cover_url = this.cover_url+comic.diamond_id+".jpg";
+        //comic.cover_url = this.cover_url+comic.diamond_id+".jpg";
       }
     });
   }
@@ -59,6 +59,7 @@ export class DcPage {
       item: item
     });
   }
+
 }
 
 export interface Comic {

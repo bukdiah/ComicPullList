@@ -17,17 +17,27 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 })
 export class ViewNotificationsPage {
   notifications: any[];
-
+  //jobs: any[];
   constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage,private localNotifications: LocalNotifications) {
     //this.notifications = navParams.get('item');
 
     //console.log('retrieved notifcations inside view',this.notifications);
     this.notifications = [];
+    //this.jobs = [];
+    //this.jobs = navParams.get('item');
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ViewNotificationsPage');
 
+    //console.log('jobs in view-notifications',this.jobs)
+    /*
+    this.storage.get('notifications').then((data)=>{
+      if (data != null) {
+        console.log("DATA",data)
+      }
+    })*/
+    
     this.localNotifications.getAll().then((data)=>{
       if (data != null){
         this.notifications = data;
@@ -47,24 +57,6 @@ export class ViewNotificationsPage {
         });
       }
     });
-    /*
-    this.storage.get('notifications').then((data)=>{
-      if(data != null) {
-        this.notifications = data;
-
-        this.notifications.forEach((arrayItem)=>{
-          let text = arrayItem.text;
-          let r_index = text.indexOf('r'); //finds the r in the word for
-          let exclaim_index = text.indexOf('!');
-
-          let series = text.substring(r_index+1,exclaim_index).trim();
-
-          console.log('series in notify',series);
-
-          arrayItem.series = series;
-        });
-      }
-    });*/
   }
 
 }

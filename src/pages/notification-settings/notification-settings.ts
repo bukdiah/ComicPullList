@@ -34,6 +34,10 @@ export class NotificationSettingsPage {
     this.viewCtrl.dismiss(data);
   }
 
+  cancel() {
+    this.viewCtrl.dismiss(null);
+  }
+
   timeChange(time) {
     console.log('timeChange called',time);
     this.chosenHours = time.hour;

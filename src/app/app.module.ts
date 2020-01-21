@@ -27,8 +27,6 @@ import {Geolocation} from '@ionic-native/geolocation';
 
 import { IonicStorageModule } from '@ionic/storage';
 
-import {ScreenOrientation} from '@ionic-native/screen-orientation';
-
 @NgModule({
   declarations: [
     MyApp,
@@ -73,8 +71,7 @@ import {ScreenOrientation} from '@ionic-native/screen-orientation';
     LocalNotifications,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ComicProvider,
-    Geolocation,
-    ScreenOrientation
+    Geolocation
   ]
 })
 export class AppModule {}

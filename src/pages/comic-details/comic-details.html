@@ -19,7 +19,7 @@
     <h3 text-center *ngIf="selectedItem">
         {{selectedItem.title}}
     </h3>
-    <img style="height: auto; width: 70vw; margin: auto; display: block" [src]="selectedItem.cover_url">
+    <img style="height: auto; width: 70vw; margin: auto; display: block" [src]="selectedItem.cover_url" onerror="this.onerror=null;this.src='/assets/img/cover_not_found.png';"/>
     <p text-left *ngIf="selectedItem">
         By: {{selectedItem.creators}}
     </p>

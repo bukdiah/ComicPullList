@@ -8,7 +8,7 @@ import {NotificationSettingsPage} from '../../pages/notification-settings/notifi
 import {ViewNotificationsPage} from '../../pages/view-notifications/view-notifications';
 
 import * as moment from 'moment';
-import * as schedule from 'node-schedule';
+//import * as schedule from 'node-schedule';
 
 @IonicPage()
 @Component({
@@ -22,7 +22,8 @@ export class BookmarksPage {
   newIssues: Comic[];
   chosenHours: number;
   chosenMinutes: number;
-
+  cover_url ="http://cdn.nexternal.com/dreamland/images/"; //can find most covers using diamond id
+  
   jobs: any[];
 
   constructor(public zone: NgZone,public navCtrl: NavController, public navParams: NavParams, private storage: Storage,
@@ -37,27 +38,87 @@ export class BookmarksPage {
     this.zone = new NgZone({enableLongStackTrace: false});
 
     this.platform.ready().then(()=>{
-      
-      this.localNotifications.on("trigger", (notif, state)=>{
-        console.log('Notification TRIGGERED');
-        //console.log('notif.data',notif.data);
 
-        let comic = JSON.parse(notif.data);
+      this.localNotifications.on("trigger", (notif,state)=>{
+        console.log("Notification triggered");
+        console.log("notif.data = ",notif.data)
 
-        this.newIssues.push(comic); //add new issue to array
-        console.log('newIssues notify',this.newIssues);
-        
-        for (let newIssue of this.newIssues){
-          for (let book of this.bookmarks){
-            //If your bookmarked book matches an issue in newIssues
-            if(newIssue.title.includes(book.series) && newIssue.creators === book.creators && newIssue.price === book.price){
-              this.zone.run(()=>{
-                book.disabled = false;
-              });
+        let item = JSON.parse(notif.data);
+
+        let series = item.series.trim();
+        let creators = item.creators;
+        let price = item.price;
+        let seriesID = item.seriesID.trim();
+        let creators_array = creators.split(" ");
+        console.log('creators_array', creators_array);
+
+        console.log('notification series value', series);
+
+        this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
+          console.log('data getSeries',data);
+          
+          let results = data.comics;
+
+          for (var arrayItem of results){
+
+            if (arrayItem.title.includes(series)) {
+              console.log("Truth 1")
             }
+
+            if(arrayItem.creators === creators) {
+              console.log("Truth 2")
+            } else {
+              console.log("arrayItem.creators = ",arrayItem.creators)
+              console.log("creators = ", creators)
+            }
+
+            if (arrayItem.price === price) {
+              console.log("Truth 3")
+            }
+
+            //arrayItem.creators and creators values may not always be the same for a comic
+            //The creative team (writer and artist and inker etc) can change from issues
+            //May be a good idea to remove it from the following if statement?
+            
+            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
+              console.log('Found correct comic!', arrayItem);
+              arrayItem.cover_url = this.cover_url+arrayItem.diamond_id+".jpg";
+
+              let nowDate = moment(new Date()).format("YYYY-MM-DD");
+    
+              console.log('nowDate',nowDate);
+
+              //New Issues Found
+              if(nowDate === arrayItem.release_date) {
+                this.newIssues.push(arrayItem); //add new issue to array
+                console.log('newIssues Array Notify',this.newIssues);
+
+                for (let newIssue of this.newIssues) {
+                  for (let book of this.bookmarks){
+                    //If your bookmarked book matches an issue in newIssues
+                    if(newIssue.title.includes(book.series) && newIssue.creators === book.creators && newIssue.price === book.price) {
+                      this.zone.run(()=>{
+                        book.disabled = false;
+                      });
+                      this.storage.set('bookmarks',this.bookmarks)
+                    }
+                  }
+                }
+              }
+              else{
+                console.log('No new issues found');
+              }
+              break;
+            }         
           }
-        }
+
+        },
+        (e)=>{console.log('onError: %s', e)},
+        ()=>{
+          console.log('On Complete');
+        });
       });
+
     });
   }
 
@@ -152,13 +213,24 @@ export class BookmarksPage {
   itemSelected(event, item) {
     console.log('item = ', item);
     console.log('newIssues',this.newIssues);
-
+    
+    for (let newIssue of this.newIssues){
+      for (let book of this.bookmarks) {
+        //If your bookmarked book matches an issue in newIssues
+        if(newIssue.title.includes(book.series) && newIssue.creators === book.creators && newIssue.price === book.price) {
+          book.disabled = true;
+          this.storage.set('bookmarks',this.bookmarks);
+          this.navCtrl.push(ComicDetailsPage,{item: newIssue});
+        }     
+      }
+    }
+    /*
     this.newIssues.forEach((arrayItem)=>{
       //if your bookmarked series matches a series in newIssues array
       if (arrayItem.title.includes(item.series) && arrayItem.creators === item.creators && arrayItem.price === item.price) {
         this.navCtrl.push(ComicDetailsPage, {item: item});
       }
-    });
+    });*/
   }
 
   add(event,item){
@@ -173,88 +245,57 @@ export class BookmarksPage {
 
     modal.onDidDismiss((data)=>{
       console.log('Time Data',data);
-      //let ID;
-      this.chosenHours = data.chosenHours;
-      this.chosenMinutes = data.chosenMinutes;
-      
-      //WEDNESDAY = 3
-      let rule = new schedule.RecurrenceRule();
-      rule.hour = this.chosenHours;
-      rule.minute = this.chosenMinutes;
-      rule.dayOfWeek = 3;
 
-      let job = schedule.scheduleJob(rule, ()=>{
-        let series = item.series.trim();
-        let creators = item.creators;
-        let price = item.price;
-        let seriesID = item.seriesID.trim();
-        let creators_array = creators.split(" ");
-        console.log('creators_array', creators_array);
+      if (data != null) {
+        let firstNotificationTime = new Date();
+        let currentDay = firstNotificationTime.getDay(); //Sunday = 0, Monday =1, etc.
+  
+        //let ID;
+        this.chosenHours = data.chosenHours;
+        this.chosenMinutes = data.chosenMinutes;
+        
+        //WEDNESDAY = 3
+        let dayDifference = 0;
 
-        //ID = Math.floor(Math.random()*101);
+        if(currentDay != 3) {
+          dayDifference = 3 - currentDay;
+        }
+  
+        if (dayDifference < 0 ){
+          dayDifference = dayDifference + 7; //for cases where the day is in the following week
+        }
+  
+        firstNotificationTime.setHours(firstNotificationTime.getHours() + (24 * (dayDifference)));
+        firstNotificationTime.setHours(this.chosenHours);
+        firstNotificationTime.setMinutes(this.chosenMinutes);
+  
+        let notification = {
+          id: Math.floor(Math.random()*101),
+          title: 'Hey!',
+          text: 'New Issues for ' + item.series + '! :)',
+          at: firstNotificationTime,
+          every: 'week',
+          data: item
+        };
+  
+        this.notifications.push(notification);
+        console.log("Notifications to be scheduled: ", this.notifications);
+  
+        this.storage.set('notifications',this.notifications);
+  
+        //Schedule the new notification
+        this.localNotifications.schedule(notification);
 
-        this.comicProvider.getSeries(series,creators_array[2]).subscribe((data)=>{
-          console.log('data getSeries',data);
-
-          let results = data.comics;
-
-          for (var arrayItem of results){
-            if (arrayItem.title.includes(series) && arrayItem.creators === creators && arrayItem.price === price){
-              console.log('Found correct comic!', arrayItem);
-    
-              let nowDate = moment(new Date()).format("YYYY-MM-DD");
-    
-              console.log('nowDate',nowDate);
-
-              //New Issues Found
-              //Used to be nowDate === comic.release_date
-              if(nowDate === arrayItem.release_date) {
-                arrayItem.seriesID = seriesID;
-                arrayItem.series = series;
-
-                let notification = {
-                  //id: Math.floor(Math.random()*101),
-                  id: ID,
-                  title: 'Hey!',
-                  text: 'New issues for '+item.series+'! :)',
-                  data: arrayItem
-                };
-          
-                this.notifications.push(notification);
-                console.log("Notifications to be scheduled: ", this.notifications);
-          
-                this.storage.set('notifications',this.notifications);
-          
-                //Schedule the new notification
-                this.localNotifications.schedule(notification);
-              } 
-              else
-              {
-                console.log('No new issues found for '+series); //Testing Only
-              }
-              break;
-            }            
-          }
-        },
-        (e)=>{console.log('onError: %s', e)},
-        ()=>{
-          console.log('On Complete');
+        let alert = this.alertCtrl.create({
+          title: 'Notification set for '+item.series,
+          buttons: ['OK']
         });
-      });
-
-      job.ID = ID;
-      job.series = item.series;
-      console.log("Job = ",job);
-      this.jobs.push(job);
-      console.log('Jobs',this.jobs);
-
-      let alert = this.alertCtrl.create({
-        title: 'Notification set for '+item.series,
-        buttons: ['OK']
-      });
-      alert.present();
+        alert.present();
+      }
+      else {
+        return;
+      }
     });
-
 
   }
 
@@ -296,6 +337,8 @@ cancelNotification(item){
 
   cancelAll()
   {
+    console.log("Cancelling jobs")
+
     this.jobs.forEach((job)=>{
       job.cancel();
     });

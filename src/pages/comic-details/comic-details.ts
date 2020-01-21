@@ -20,24 +20,16 @@ export class ComicDetailsPage {
   list: Comic[];
   added: boolean;
   isSeries: boolean;
-  //bookmarks: string[];
   bookmarks: Comic[];
 
   constructor(public ngZone: NgZone, public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private loadingCtrl: LoadingController) {
     // If we navigated to this page, we will have an item available as a nav param
     this.selectedItem = navParams.get('item');
-    //this.list = [];
-    console.log('indexof returned',this.selectedItem.title.indexOf('#') );
-    if(this.selectedItem.title.indexOf('#')=== -1) //returns -1 if it cannot find # symbol. Means it is NOT an ongoing comic series, but rather a TPB or something
-    {
-        this.isSeries = false;
-    }
-    else
-    {
-        this.isSeries = true;
-    }
+    //console.log('indexof returned',this.selectedItem.title.indexOf('#') );
+    console.log("Comic-Details.ts Constructor called!");
   }
 
+  //Fired when a page is created for the first time
   ionViewDidLoad() {
     console.log('ionViewDidLoad ComicDetailsPage');
 
@@ -49,6 +41,22 @@ export class ComicDetailsPage {
     //Show the pop up
     loadingPopup.present();
 
+    //returns -1 if it cannot find # symbol. Means it is NOT an ongoing comic series, but rather a TPB or something
+    //Means you cannot bookmark it
+    
+    if(this.selectedItem.title.indexOf('#')=== -1)
+    {
+        //this.isSeries = false;
+        this.selectedItem.isASeries = false;
+    }
+    else
+    {
+        //this.isSeries = true;
+        this.selectedItem.isASeries = true;
+    }
+
+    console.log('this.selectedItem.isASeries = ', this.selectedItem.isASeries)
+    
     //Retrieve pull list
     let pull_list_retrieve = this.storage.get('pull-list').then((data)=>{
       if (data != null)
@@ -61,14 +69,11 @@ export class ComicDetailsPage {
                 {
                   console.log("TITLE SAVED IN PULL LIST ALREADY", comic.title);
                   this.selectedItem.added = true;
-                  this.added = this.selectedItem.added;
                 }
             }
         }
       else{
         this.list = [];
-        //console.log('added =', this.added)
-        this.added = false;
       }
     });
 
@@ -90,21 +95,25 @@ export class ComicDetailsPage {
             console.log("SERIES ALREADY BOOKMARKED", title);
             this.ngZone.run(()=>{
               this.selectedItem.bookmarked = true;
-              this.isSeries = !this.selectedItem.bookmarked;
             })
-            //this.selectedItem.bookmarked = true;
-            //this.isSeries = !this.selectedItem.bookmarked;
+            break;            
+          }
+          else {
+            console.log('Title does not match yet...continuing');
+            this.ngZone.run(()=>{
+              this.selectedItem.bookmarked = false;
+            })
+            continue;
           }
         }
       }
       else{
-        console.log('Else Block of retrieve bookmarks');
+        console.log('Bookmarks Array is EMPTY');
         this.bookmarks = [];
-        /*
+
         this.ngZone.run(()=>{
-          this.selectedItem.bookmarked = true;
-          this.isSeries = !this.selectedItem.bookmarked;
-        })*/
+          this.selectedItem.bookmarked = false;
+        })
       }
     });
 
@@ -113,10 +122,11 @@ export class ComicDetailsPage {
       bookmark_retrieve
     ]).then((data)=>{
       loadingPopup.dismiss();
+      console.log("this.selectedItem.bookmarked = ",this.selectedItem.bookmarked)
     });
   }
 
-  
+
   ionViewDidEnter(){
     console.log('ionViewDidEnter loaded of Comic-Details')
     //Create the loading popup
@@ -127,9 +137,24 @@ export class ComicDetailsPage {
     //Show the pop up
     loadingPopup.present();
 
+    //returns -1 if it cannot find # symbol. Means it is NOT an ongoing comic series, but rather a TPB or something
+    //Means you cannot bookmark it
+    
+    if(this.selectedItem.title.indexOf('#')=== -1)
+    {
+        //this.isSeries = false;
+        this.selectedItem.isASeries = false;
+    }
+    else
+    {
+        //this.isSeries = true;
+        this.selectedItem.isASeries = true;
+    }
+
+    console.log('this.selectedItem.isASeries = ', this.selectedItem.isASeries)
+
     //Retrieve Bookmarks
     let bookmark_retrieve=this.storage.get('bookmarks').then((data)=>{
-      console.log('Performing bookmark_retrieve!', data);
       if(data != null && data.length > 0)
       {
         this.bookmarks = data;
@@ -146,16 +171,64 @@ export class ComicDetailsPage {
             console.log("SERIES ALREADY BOOKMARKED", title);
             this.ngZone.run(()=>{
               this.selectedItem.bookmarked = true;
-              this.isSeries = !this.selectedItem.bookmarked;
+            })
+            break;            
+          }
+          else {
+            console.log('Title does not match yet...continuing');
+            this.ngZone.run(()=>{
+              this.selectedItem.bookmarked = false;
+            })
+            continue;
+          }
+        }
+      }
+      else{
+        console.log('Bookmarks Array is EMPTY');
+        this.bookmarks = [];
+
+        this.ngZone.run(()=>{
+          this.selectedItem.bookmarked = false;
+        })
+      }
+    });
+    /* OLD
+    //Retrieve Bookmarks
+    let bookmark_retrieve=this.storage.get('bookmarks').then((data)=>{
+      console.log('Performing bookmark_retrieve!', data);
+      if(data != null && data.length > 0)
+      {
+        this.bookmarks = data;
+        //Find # symbol
+        var poundIndex = this.selectedItem.title.indexOf('#');
+
+        if(poundIndex === -1)
+          return;
+
+        for (var title of this.bookmarks)
+        {
+          console.log('Tile in bookmarks',title);
+          console.log('selected Item Title',this.selectedItem.title.slice(0,poundIndex).trim())
+          
+          if (title.series === this.selectedItem.title.slice(0,poundIndex).trim())
+          {
+            console.log("SERIES ALREADY BOOKMARKED", title);
+            this.ngZone.run(()=>{
+              this.selectedItem.bookmarked = true;
+              //this.isSeries = !this.selectedItem.bookmarked;
+              this.selectedItem.isASeries = !this.selectedItem.bookmarked;
             })
             break;
           }
           else{
             console.log('Title does not match yet...continuing');
+            continue;
+            
             this.ngZone.run(()=>{
-              this.selectedItem.bookmarked = false;
-              this.isSeries = !this.selectedItem.bookmarked;
-            })            
+              this.selectedItem.bookmarked = false; 
+              //this.isSeries = !this.selectedItem.bookmarked;
+              this.selectedItem.isASeries = !this.selectedItem.bookmarked;
+            })           
           }
         }
       }
@@ -169,32 +242,32 @@ export class ComicDetailsPage {
         })
       }
     });
-
+*/
     Promise.all([
       bookmark_retrieve
     ]).then((data)=>{
       console.log('ionViewDidEnter data = ',data);
       loadingPopup.dismiss();
+      console.log("this.selectedItem.bookmarked = ",this.selectedItem.bookmarked)
+      
     });
   }
 
-  addToPullList(){
+  addToPullList(item){
    // this.selectedItem.added = false;
 
    // this.added = this.selectedItem.added;
-    this.added = true;
+    //this.added = true;
     this.selectedItem.disabled = true;
-    this.list.push(this.selectedItem);
+    item.added = true;
+    this.list.push(item);
+    //this.list.push(this.selectedItem);
     
-    //this.storage.set('pull-list', JSON.stringify(this.selectedItem));
     this.storage.set('pull-list', this.list);
   }
 
   bookmark(item) {
     console.log("CLICKED BOOKMARK");
-
-    let booked: boolean = true;
-    this.isSeries = !booked;
 
     let poundIndex = item.title.indexOf('#');
 
@@ -205,24 +278,15 @@ export class ComicDetailsPage {
       item.series = seriesTitle.trim();
       item.disabled = true;
       item.bookmarked = true;
-      //item.seriesID = seriesTitle.replace(" ","").replace("&","").trim();
+      //item.isASeries = !item.bookmarked;
       item.seriesID = seriesTitle.replace(/ /g, "").replace("&","").trim();
-      //this.bookmarks.push(seriesTitle);
+      
       this.bookmarks.push(item);
       //save to Storage
       this.storage.set('bookmarks', this.bookmarks);
 
       console.log('Bookmarks Array Saved: ',this.bookmarks);
     }
-    //this.isSeries = true;
-    /*
-    this.platform.ready().then(()=>{
-      this.localNotifications.schedule({
-        id:1,
-        text: "NOTIFIED SUCKA",
-        data: "test"
-      });
-    });*/
   }
 
 }
@@ -240,5 +304,5 @@ interface Comic {
   bookmarked?: boolean,
   series?: string,
   seriesID?:string,
-  disabled?: boolean
+  isASeries?:boolean
 }
